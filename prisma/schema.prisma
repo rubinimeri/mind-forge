@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @unique @default(uuid())
+  email     String    @unique
+  name      String
+  lastName  String?
+  createdAt DateTime  @default(now())
+  thoughts  Thought[]
+  Board     Board?
+}
+
+model Board {
+  id      String   @unique @default(uuid())
+  user    User     @relation(fields: [userId], references: [id])
+  userId  String   @unique
+  columns Column[]
+}
+
+model Column {
+  id       String  @unique @default(uuid())
+  Board    Board?  @relation(fields: [boardId], references: [id])
+  boardId  String?
+  title    String
+  position Int
+  tasks    Task[]
+}
+
+model Thought {
+  id         String      @unique @default(uuid())
+  user       User        @relation(fields: [userId], references: [id])
+  userId     String
+  content    String
+  AIResponse AIResponse?
+  createdAt  DateTime    @default(now())
+}
+
+model AIResponse {
+  id            String   @unique @default(uuid())
+  thought       Thought  @relation(fields: [thoughtId], references: [id])
+  thoughtId     String   @unique
+  insight       String
+  suggestedGoal String
+  summary       String
+  tasks         Task[]
+  themes        String[]
+}
+
+model Task {
+  id           String     @unique @default(uuid())
+  content      String
+  theme        String
+  AIResponse   AIResponse @relation(fields: [AIResponseId], references: [id])
+  AIResponseId String
+  createdAt    DateTime   @default(now())
+  column       Column?    @relation(fields: [columnId], references: [id])
+  columnId     String
+}
