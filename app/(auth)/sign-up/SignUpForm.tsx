@@ -64,8 +64,8 @@ export default function SignUpForm() {
 
   return (
     <Form {...form}>
-      <div className="mx-auto max-w-md flex-col py-4 rounded-lg">
-        <CardHeader>
+      <div className="mx-auto max-w-lg flex-col py-8 min-sm:rounded-4xl bg-white shadow-2xl">
+        <CardHeader className={'text-center'}>
           <CardTitle>
             <h1 className="text-3xl">Sign Up</h1>
           </CardTitle>
@@ -74,13 +74,13 @@ export default function SignUpForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-4 py-10"}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-3 py-8"}>
             <FormField
               control={form.control}
               name="firstName"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>First Name *</FormLabel>
+                  <FormLabel>First Name <span className={'text-red-500'}>*</span></FormLabel>
                   <FormControl>
                     <Input
                       placeholder=""
@@ -118,7 +118,7 @@ export default function SignUpForm() {
               name="email"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Email *</FormLabel>
+                  <FormLabel>Email <span className={'text-red-500'}>*</span></FormLabel>
                   <FormControl>
                     <Input
                       placeholder=""
@@ -137,7 +137,7 @@ export default function SignUpForm() {
               name="password"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Password *</FormLabel>
+                  <FormLabel>Password <span className={'text-red-500'}>*</span></FormLabel>
                   <FormControl>
                     <PasswordInput placeholder="" {...field} />
                   </FormControl>
@@ -152,7 +152,7 @@ export default function SignUpForm() {
               name="confirmPassword"
               render={({field}) => (
                 <FormItem>
-                  <FormLabel>Confirm Password *</FormLabel>
+                  <FormLabel>Confirm Password <span className={'text-red-500'}>*</span></FormLabel>
                   <FormControl>
                     <PasswordInput placeholder="" {...field} />
                   </FormControl>
