@@ -32,6 +32,7 @@ import {
   PasswordInput
 } from "@/components/ui/password-input"
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
+import Link from "next/link";
 
 const formSchema = z.object({
   firstName: z.string().min(1),
@@ -41,7 +42,7 @@ const formSchema = z.object({
   confirmPassword: z.string()
 });
 
-export default function SignInForm() {
+export default function SignUpForm() {
 
   const form = useForm < z.infer < typeof formSchema >> ({
     resolver: zodResolver(formSchema),
@@ -68,7 +69,9 @@ export default function SignInForm() {
           <CardTitle>
             <h1 className="text-3xl">Sign Up</h1>
           </CardTitle>
-          <CardDescription>Welcome to MindForge, let's create a new account!</CardDescription>
+          <CardDescription>
+            Welcome to MindForge, let's create a new account! <br/>
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-4 py-10"}>
@@ -164,6 +167,7 @@ export default function SignInForm() {
           <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
           <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
           <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="google-logo.png" alt=""/></span>Sign up with Google</Button>
+          <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
         </CardFooter>
       </div>
     </Form>
