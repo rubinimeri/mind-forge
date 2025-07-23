@@ -34,13 +34,18 @@ import {
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 
-const formSchema = z.object({
-  firstName: z.string().min(1),
-  lastName: z.string().min(1).optional(),
-  email: z.string(),
-  password: z.string(),
-  confirmPassword: z.string()
-});
+const formSchema = z
+  .object({
+    firstName: z.string().min(1, { error: 'Name is required.' }),
+    lastName: z.string().min(1).optional(),
+    email: z.email({ error: 'Email is required.' }),
+    password: z.string({ error: 'Password is required'}).min(8, { error: 'Password must be at least 8 characters.' }),
+    confirmPassword: z.string()
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    error: "Passwords do not match"
+  });
 
 export default function SignUpForm() {
 
@@ -64,17 +69,18 @@ export default function SignUpForm() {
 
   return (
     <Form {...form}>
-      <div className="mx-auto max-w-lg flex-col py-8 min-sm:rounded-4xl bg-white shadow-2xl">
-        <CardHeader className={'text-center'}>
-          <CardTitle>
-            <h1 className="text-3xl">Sign Up</h1>
-          </CardTitle>
-          <CardDescription>
-            Welcome to MindForge, let's create a new account! <br/>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-3 py-8"}>
+      <div className="mx-auto max-w-lg flex-col min-sm:rounded-4xl bg-white shadow-2xl">
+          <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-8 py-8"}>
+            <CardHeader className={'text-center'}>
+              <CardTitle>
+                <h1 className="text-3xl">Sign Up</h1>
+              </CardTitle>
+              <CardDescription>
+                Welcome to MindForge, let's create a new account! <br/>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className={"space-y-3"}>
+
             <FormField
               control={form.control}
               name="firstName"
@@ -161,14 +167,16 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-          </form>
         </CardContent>
-        <CardFooter className={"flex flex-col gap-1"}>
-          <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
-          <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
-          <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="google-logo.png" alt=""/></span>Sign up with Google</Button>
-          <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
-        </CardFooter>
+
+            <CardFooter className={"flex flex-col gap-1"}>
+              <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
+              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
+              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="google-logo.png" alt=""/></span>Sign up with Google</Button>
+              <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
+            </CardFooter>
+          </form>
+
       </div>
     </Form>
   )
