@@ -1,2 +1,10 @@
 import NextAuth from "next-auth"
-export const { auth, handlers, signOut, signIn } = NextAuth({ providers: [] })
+import Credentials from "@auth/core/providers/credentials";
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import { prisma } from "@/prisma/prisma";
+
+export const { auth, handlers, signOut, signIn } =
+  NextAuth({
+    adapter: PrismaAdapter(prisma),
+    providers: [Credentials]
+  })
