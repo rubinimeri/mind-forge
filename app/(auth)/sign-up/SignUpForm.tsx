@@ -33,27 +33,15 @@ import {
 } from "@/components/ui/password-input"
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
-
-const formSchema = z
-  .object({
-    firstName: z.string().min(1, { error: 'Name is required.' }),
-    lastName: z.string().min(1).optional(),
-    email: z.email({ error: 'Email is required.' }),
-    password: z.string({ error: 'Password is required'}).min(8, { error: 'Password must be at least 8 characters.' }),
-    confirmPassword: z.string()
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    path: ['confirmPassword'],
-    error: "Passwords do not match"
-  });
+import { signUpSchema } from "@/lib/schemas/auth.schema";
 
 export default function SignUpForm() {
 
-  const form = useForm < z.infer < typeof formSchema >> ({
-    resolver: zodResolver(formSchema),
+  const form = useForm < z.infer < typeof signUpSchema >> ({
+    resolver: zodResolver(signUpSchema),
   })
 
-  function onSubmit(values: z.infer < typeof formSchema > ) {
+  function onSubmit(values: z.infer < typeof signUpSchema > ) {
     try {
       console.log(values);
       toast(

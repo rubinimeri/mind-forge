@@ -32,20 +32,15 @@ import {
 } from "@/components/ui/password-input"
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
-
-const formSchema = z
-  .object({
-    email: z.email({ error: 'Email is required.' }),
-    password: z.string({ error: 'Password is required'}).min(8, { error: 'Password must be at least 8 characters.' }),
-  })
+import { signInSchema } from "@/lib/schemas/auth.schema";
 
 export default function SignInForm() {
 
-  const form = useForm < z.infer < typeof formSchema >> ({
-    resolver: zodResolver(formSchema),
+  const form = useForm < z.infer < typeof signInSchema >> ({
+    resolver: zodResolver(signInSchema),
   })
 
-  function onSubmit(values: z.infer < typeof formSchema > ) {
+  function onSubmit(values: z.infer < typeof signInSchema > ) {
     try {
       console.log(values);
       toast(
