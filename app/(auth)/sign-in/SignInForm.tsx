@@ -1,9 +1,6 @@
 "use client"
 
 import {
-  toast
-} from "sonner"
-import {
   useForm
 } from "react-hook-form"
 import {
@@ -33,24 +30,25 @@ import {
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 import { signInSchema } from "@/lib/schemas/auth.schema";
+import {signIn, useSession} from "next-auth/react";
+import {redirect} from "next/navigation";
 
 export default function SignInForm() {
+
+  const { data: session } = useSession()
+
+  if (session?.user) redirect("/")
 
   const form = useForm < z.infer < typeof signInSchema >> ({
     resolver: zodResolver(signInSchema),
   })
 
-  function onSubmit(values: z.infer < typeof signInSchema > ) {
+  async function onSubmit(values: z.infer < typeof signInSchema > ) {
     try {
       console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      await signIn("credentials", values)
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
     }
   }
 
@@ -101,7 +99,7 @@ export default function SignInForm() {
             />
           </CardContent>
           <CardFooter className={"flex flex-col gap-1"}>
-            <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
+            <Button type="submit" className={"w-full cursor-pointer"}>Sign In</Button>
             <Button variant={"outline"} className={"w-full cursor-pointer"}>
               <span><img src="github-logo.png" alt="" width={24}/></span>
               Continue with Github
