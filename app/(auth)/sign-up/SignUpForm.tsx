@@ -1,9 +1,6 @@
 "use client"
 
 import {
-  toast
-} from "sonner"
-import {
   useForm
 } from "react-hook-form"
 import {
@@ -34,24 +31,31 @@ import {
 import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 import { signUpSchema } from "@/lib/schemas/auth.schema";
+import {signUp} from "@/app/(auth)/actions";
+import {signIn} from "next-auth/react";
+import { useSearchParams } from "next/navigation";
+import {useState} from "react";
 
 export default function SignUpForm() {
+  const [error, setError] = useState<string>("");
+  const searchParams = useSearchParams();
 
   const form = useForm < z.infer < typeof signUpSchema >> ({
     resolver: zodResolver(signUpSchema),
   })
 
-  function onSubmit(values: z.infer < typeof signUpSchema > ) {
+  async function onSubmit(values: z.infer < typeof signUpSchema > ) {
     try {
-      console.log(values);
-      toast(
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      );
+      const result = await signUp(values)
+      if (result?.error) {
+        setError(result.error)
+        return;
+      }
+
+      await signIn("credentials", { email: values.email, password: values.password, redirect: false })
     } catch (error) {
       console.error("Form submission error", error);
-      toast.error("Failed to submit the form. Please try again.");
+      setError("Account creation failed!")
     }
   }
 
@@ -155,12 +159,13 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
+            <FormDescription className={"text-red-500"}>{error}</FormDescription>
         </CardContent>
 
             <CardFooter className={"flex flex-col gap-1"}>
               <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
-              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
-              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="google-logo.png" alt=""/></span>Sign up with Google</Button>
+              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="/github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
+              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="/google-logo.png" alt=""/></span>Sign up with Google</Button>
               <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
             </CardFooter>
           </form>

@@ -46,7 +46,7 @@ export default function SignInForm() {
   async function onSubmit(values: z.infer < typeof signInSchema > ) {
     try {
       console.log(values);
-      await signIn("credentials", values)
+      const result = await signIn("credentials", values)
     } catch (error) {
       console.error("Form submission error", error);
     }
