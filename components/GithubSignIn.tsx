@@ -7,7 +7,7 @@ function GithubSignIn() {
       "use server"
       await signIn("github")
     }}>
-      <Button variant={"outline"} className={"w-full cursor-pointer"}>
+      <Button variant={"outline"} className={"cursor-pointer w-full"} type={"submit"}>
       <span><img src="/github-logo.png" alt="" width={24}/></span>
       Continue with Github
     </Button>

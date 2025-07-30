@@ -27,20 +27,14 @@ import {
 import {
   PasswordInput
 } from "@/components/ui/password-input"
-import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
+import {CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 import { signInSchema } from "@/lib/schemas/auth.schema";
-import {signIn, useSession} from "next-auth/react";
-import {redirect} from "next/navigation";
+import {signIn} from "next-auth/react";
 import {useState} from "react";
-import GithubSignIn from "@/components/GithubSignIn";
 
 export default function SignInForm() {
   const [error, setError] = useState<string>("");
-
-  const { data: session } = useSession()
-
-  if (session?.user) redirect("/")
 
   const form = useForm < z.infer < typeof signInSchema >> ({
     resolver: zodResolver(signInSchema),
@@ -63,16 +57,7 @@ export default function SignInForm() {
 
   return (
     <Form {...form}>
-      <div className="mx-auto max-w-lg flex-col min-sm:rounded-4xl bg-white shadow-2xl">
         <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-8 py-8"}>
-          <CardHeader className={'text-center'}>
-            <CardTitle>
-              <h1 className="text-3xl">Sign In</h1>
-            </CardTitle>
-            <CardDescription>
-              Welcome to MindForge, let's sign you in! <br/>
-            </CardDescription>
-          </CardHeader>
           <CardContent className={"space-y-3"}>
             <FormField
               control={form.control}
@@ -110,13 +95,9 @@ export default function SignInForm() {
           </CardContent>
           <CardFooter className={"flex flex-col gap-1"}>
             <Button type="submit" className={"w-full cursor-pointer"}>Sign In</Button>
-            <Button variant={"outline"} className={"w-full cursor-pointer"}>
-              <span><img src="/google-logo.png" alt=""/></span>
-              Continue with Google</Button>
             <p className={'w-max mt-2'}>Don't have an account? <Link href={'/sign-up'} className={'hover:underline'}><strong>Sign up</strong></Link></p>
           </CardFooter>
         </form>
-      </div>
     </Form>
   )
 }

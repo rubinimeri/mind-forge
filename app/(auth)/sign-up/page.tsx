@@ -1,7 +1,16 @@
 import React from 'react';
 import SignUpForm from "@/app/(auth)/sign-up/SignUpForm";
+import {CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import GithubSignIn from "@/components/GithubSignIn";
+import GoogleSignIn from "@/components/GoogleSignIn";
+import {auth} from "@/auth";
+import {redirect} from "next/navigation";
 
 async function Page() {
+  const session = await auth();
+
+  if (session?.user) redirect('/')
+
   const background = {
     background: '#4545ff linear-gradient(45deg, rgba(69, 69, 255, 1) 0%, rgba(0, 212, 255, 1) 100%)'
   }
@@ -9,7 +18,21 @@ async function Page() {
     <>
       <nav className={"p-2"}><img className={"mx-auto"} src="/full-logo.png" alt="" width={100}/></nav>
       <main className={"min-h-screen content-center"} style={background}>
-        <SignUpForm />
+        <div className="mx-auto max-w-md flex-col min-sm:rounded-4xl bg-white shadow-2xl py-8">
+          <CardHeader className={'text-center'}>
+            <CardTitle>
+              <h1 className="text-3xl">Sign Up</h1>
+            </CardTitle>
+            <CardDescription>
+              Welcome to MindForge, let's create a new account! <br/>
+            </CardDescription>
+          </CardHeader>
+          <SignUpForm />
+          <CardFooter className={"grid gap-2"}>
+            <GithubSignIn/>
+            <GoogleSignIn/>
+          </CardFooter>
+        </div>
       </main>
     </>
   );

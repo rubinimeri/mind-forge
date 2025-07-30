@@ -6,6 +6,7 @@ import {hashAndSaltPassword} from "@/utils/password";
 import { JWT } from "next-auth/jwt";
 import { Session, User } from "next-auth";
 import GitHub from "next-auth/providers/github";
+import Google  from "next-auth/providers/google";
 
 export const { auth, handlers, signOut, signIn } =
   //@ts-ignore
@@ -14,6 +15,7 @@ export const { auth, handlers, signOut, signIn } =
     session: { strategy: "jwt" },
     providers: [
       GitHub,
+      Google,
       Credentials({
         credentials: {
           email: { label: "Email", type: "email" },
@@ -32,7 +34,9 @@ export const { auth, handlers, signOut, signIn } =
             if (!user)
               return null
 
-            const hashedPassword = await hashAndSaltPassword(credentials.password, user.salt)
+            let hashedPassword
+            if (user?.salt)
+              hashedPassword = await hashAndSaltPassword(credentials.password, user.salt)
 
             const passwordsMatch = hashedPassword === user.password;
 

@@ -28,7 +28,7 @@ import {
 import {
   PasswordInput
 } from "@/components/ui/password-input"
-import {CardHeader, CardTitle, CardDescription, CardContent, CardFooter} from "@/components/ui/card";
+import {CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 import { signUpSchema } from "@/lib/schemas/auth.schema";
 import {signUp} from "@/app/(auth)/actions";
@@ -59,116 +59,101 @@ export default function SignUpForm() {
 
   return (
     <Form {...form}>
-      <div className="mx-auto max-w-lg flex-col min-sm:rounded-4xl bg-white shadow-2xl">
-          <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-8 py-8"}>
-            <CardHeader className={'text-center'}>
-              <CardTitle>
-                <h1 className="text-3xl">Sign Up</h1>
-              </CardTitle>
-              <CardDescription>
-                Welcome to MindForge, let's create a new account! <br/>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className={"space-y-3"}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className={"space-y-8 py-8"}>
+        <CardContent className={"space-y-3"}>
+        <FormField
+          control={form.control}
+          name="firstName"
+          render={({field}) => (
+            <FormItem>
+              <FormLabel>First Name <span className={'text-red-500'}>*</span></FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
+                  type=""
+                  {...field} />
+              </FormControl>
+              <FormDescription>This is your public display name.</FormDescription>
+              <FormMessage/>
+            </FormItem>
+          )}
+        />
 
-            <FormField
-              control={form.control}
-              name="firstName"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>First Name <span className={'text-red-500'}>*</span></FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({field}) => (
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
 
-                      type=""
-                      {...field} />
-                  </FormControl>
-                  <FormDescription>This is your public display name.</FormDescription>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
+                  type=""
+                  {...field} />
+              </FormControl>
 
-            <FormField
-              control={form.control}
-              name="lastName"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
+              <FormMessage/>
+            </FormItem>
+          )}
+        />
 
-                      type=""
-                      {...field} />
-                  </FormControl>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({field}) => (
+            <FormItem>
+              <FormLabel>Email <span className={'text-red-500'}>*</span></FormLabel>
+              <FormControl>
+                <Input
+                  placeholder=""
 
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
+                  type="email"
+                  {...field} />
+              </FormControl>
 
-            <FormField
-              control={form.control}
-              name="email"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Email <span className={'text-red-500'}>*</span></FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder=""
+              <FormMessage/>
+            </FormItem>
+          )}
+        />
 
-                      type="email"
-                      {...field} />
-                  </FormControl>
+        <FormField
+          control={form.control}
+          name="password"
+          render={({field}) => (
+            <FormItem>
+              <FormLabel>Password <span className={'text-red-500'}>*</span></FormLabel>
+              <FormControl>
+                <PasswordInput placeholder="" {...field} />
+              </FormControl>
+              <FormDescription>Password must be at least 8 characters long.</FormDescription>
+              <FormMessage/>
+            </FormItem>
+          )}
+        />
 
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({field}) => (
+            <FormItem>
+              <FormLabel>Confirm Password <span className={'text-red-500'}>*</span></FormLabel>
+              <FormControl>
+                <PasswordInput placeholder="" {...field} />
+              </FormControl>
+              <FormDescription>Retype your password.</FormDescription>
+              <FormMessage/>
+            </FormItem>
+          )}
+        />
+        <FormDescription className={"text-red-500"}>{error}</FormDescription>
+      </CardContent>
 
-            <FormField
-              control={form.control}
-              name="password"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Password <span className={'text-red-500'}>*</span></FormLabel>
-                  <FormControl>
-                    <PasswordInput placeholder="" {...field} />
-                  </FormControl>
-                  <FormDescription>Password must be at least 8 characters long.</FormDescription>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({field}) => (
-                <FormItem>
-                  <FormLabel>Confirm Password <span className={'text-red-500'}>*</span></FormLabel>
-                  <FormControl>
-                    <PasswordInput placeholder="" {...field} />
-                  </FormControl>
-                  <FormDescription>Retype your password.</FormDescription>
-                  <FormMessage/>
-                </FormItem>
-              )}
-            />
-            <FormDescription className={"text-red-500"}>{error}</FormDescription>
-        </CardContent>
-
-            <CardFooter className={"flex flex-col gap-1"}>
-              <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
-              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="/github-logo.png" alt="" width={24}/></span>Sign up with Github</Button>
-              <Button variant={"outline"} className={"w-full cursor-pointer"}><span><img src="/google-logo.png" alt=""/></span>Sign up with Google</Button>
-              <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
-            </CardFooter>
-          </form>
-
-      </div>
+        <CardFooter className={"flex flex-col gap-1"}>
+          <Button type="submit" className={"w-full cursor-pointer"}>Create Account</Button>
+          <p className={'w-max mt-2'}>Already have an account? <Link href={'/sign-in'} className={'hover:underline'}><strong>Sign In</strong></Link></p>
+        </CardFooter>
+      </form>
     </Form>
   )
 }
