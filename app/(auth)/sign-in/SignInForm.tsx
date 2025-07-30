@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/button"
 import {
   Form,
-  FormControl,
+  FormControl, FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,8 +32,10 @@ import Link from "next/link";
 import { signInSchema } from "@/lib/schemas/auth.schema";
 import {signIn, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
+import {useState} from "react";
 
 export default function SignInForm() {
+  const [error, setError] = useState<string>("");
 
   const { data: session } = useSession()
 
@@ -46,7 +48,13 @@ export default function SignInForm() {
   async function onSubmit(values: z.infer < typeof signInSchema > ) {
     try {
       console.log(values);
-      const result = await signIn("credentials", values)
+      const response = await signIn("credentials", { email: values.email, password: values.password, redirect: false })
+      console.log(response)
+      if (response?.error === "CredentialsSignin") {
+        setError("Invalid email or password!")
+      } else if (response?.error) {
+        setError("Something went wrong!")
+      }
     } catch (error) {
       console.error("Form submission error", error);
     }
@@ -97,6 +105,7 @@ export default function SignInForm() {
                 </FormItem>
               )}
             />
+            <FormDescription className={"text-red-500"}>{error}</FormDescription>
           </CardContent>
           <CardFooter className={"flex flex-col gap-1"}>
             <Button type="submit" className={"w-full cursor-pointer"}>Sign In</Button>

@@ -33,12 +33,10 @@ import Link from "next/link";
 import { signUpSchema } from "@/lib/schemas/auth.schema";
 import {signUp} from "@/app/(auth)/actions";
 import {signIn} from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 import {useState} from "react";
 
 export default function SignUpForm() {
   const [error, setError] = useState<string>("");
-  const searchParams = useSearchParams();
 
   const form = useForm < z.infer < typeof signUpSchema >> ({
     resolver: zodResolver(signUpSchema),
