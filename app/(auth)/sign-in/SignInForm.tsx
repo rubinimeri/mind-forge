@@ -33,6 +33,7 @@ import { signInSchema } from "@/lib/schemas/auth.schema";
 import {signIn, useSession} from "next-auth/react";
 import {redirect} from "next/navigation";
 import {useState} from "react";
+import GithubSignIn from "@/components/GithubSignIn";
 
 export default function SignInForm() {
   const [error, setError] = useState<string>("");
@@ -110,16 +111,11 @@ export default function SignInForm() {
           <CardFooter className={"flex flex-col gap-1"}>
             <Button type="submit" className={"w-full cursor-pointer"}>Sign In</Button>
             <Button variant={"outline"} className={"w-full cursor-pointer"}>
-              <span><img src="/github-logo.png" alt="" width={24}/></span>
-              Continue with Github
-            </Button>
-            <Button variant={"outline"} className={"w-full cursor-pointer"}>
               <span><img src="/google-logo.png" alt=""/></span>
               Continue with Google</Button>
             <p className={'w-max mt-2'}>Don't have an account? <Link href={'/sign-up'} className={'hover:underline'}><strong>Sign up</strong></Link></p>
           </CardFooter>
         </form>
-
       </div>
     </Form>
   )

@@ -5,6 +5,7 @@ import Credentials from "@auth/core/providers/credentials";
 import {hashAndSaltPassword} from "@/utils/password";
 import { JWT } from "next-auth/jwt";
 import { Session, User } from "next-auth";
+import GitHub from "next-auth/providers/github";
 
 export const { auth, handlers, signOut, signIn } =
   //@ts-ignore
@@ -12,6 +13,7 @@ export const { auth, handlers, signOut, signIn } =
     adapter: PrismaAdapter(prisma),
     session: { strategy: "jwt" },
     providers: [
+      GitHub,
       Credentials({
         credentials: {
           email: { label: "Email", type: "email" },

@@ -1,5 +1,6 @@
 import React from 'react';
 import SignInForm from "@/app/(auth)/sign-in/SignInForm";
+import GithubSignIn from "@/components/GithubSignIn";
 
 async function Page() {
   const background = {
@@ -10,6 +11,7 @@ async function Page() {
       <nav className={"p-2"}><img className={"mx-auto"} src="/full-logo.png" alt="" width={100}/></nav>
       <main className={"min-h-screen content-center"} style={background}>
         <SignInForm />
+        <GithubSignIn />
       </main>
     </>
   );
