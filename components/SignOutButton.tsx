@@ -8,6 +8,7 @@ function SignOutButton({ className = "" }: { className?: string }) {
   return (
       <Button
       variant={'destructive'}
+      size={"sm"}
       className={cn("cursor-pointer", className)}
       type="submit"
       onClick={() => signOut()}>
