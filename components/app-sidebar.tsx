@@ -13,6 +13,7 @@ import {
 import {Home, LayoutDashboard, ChartArea, Kanban} from "lucide-react";
 import {NavUser} from "@/components/nav-user";
 import {auth} from "@/auth";
+import {headers} from "next/headers";
 
 const data = {
   navMain: [
@@ -51,6 +52,10 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   if (!session?.user) return null
 
   const { user } = session
+
+  const headersList = await headers();
+  const pathname = headersList.get('x-pathname')
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -63,7 +68,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild >
+                    <SidebarMenuButton asChild isActive={item.url === pathname} >
                       <a href={item.url}>{item.icon}{item.title}</a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
