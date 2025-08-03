@@ -54,7 +54,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <img src="/horizontal-logo-1.png" alt="" width={140}/>
+        <img src="/horizontal-logo.png" alt="" width={140}/>
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (

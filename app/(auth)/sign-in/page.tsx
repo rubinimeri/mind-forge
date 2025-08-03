@@ -16,7 +16,7 @@ async function Page() {
   }
   return (
     <>
-      <nav className={"p-2"}><img className={"mx-auto"} src="/full-logo.png" alt="" width={100}/></nav>
+      <nav className={"py-2"}><img className={"mx-auto"} src="/horizontal-logo.png" alt="" width={200}/></nav>
       <main className={"min-h-screen content-center"} style={background}>
         <div className="mx-auto max-w-md flex-col min-sm:rounded-4xl bg-white shadow-2xl py-8">
           <CardHeader className={'text-center'}>
