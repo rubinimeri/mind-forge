@@ -68,7 +68,6 @@ export default function SignInForm() {
                   <FormControl>
                     <Input
                       placeholder=""
-
                       type="email"
                       {...field} />
                   </FormControl>
