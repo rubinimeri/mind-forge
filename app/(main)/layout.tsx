@@ -2,8 +2,12 @@ import React from 'react';
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
 import {AppSidebar} from "@/components/app-sidebar";
 import {Separator} from "@/components/ui/separator";
+import {headers} from "next/headers";
 
-function MainLayout({ children }: { children: React.ReactNode }) {
+async function MainLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers();
+  const path = headersList.get("x-pathname");
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -14,6 +18,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
+          {path === "/" ? "Home" : path?.slice(1)}
         </header>
         {children}
       </SidebarInset>

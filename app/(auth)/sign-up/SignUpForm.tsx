@@ -31,7 +31,7 @@ import {
 import {CardContent, CardFooter} from "@/components/ui/card";
 import Link from "next/link";
 import { signUpSchema } from "@/lib/schemas/auth.schema";
-import {signUp} from "@/app/(auth)/actions";
+import {signUp} from "@/app/actions";
 import {signIn} from "next-auth/react";
 import {useState} from "react";
 
