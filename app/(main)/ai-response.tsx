@@ -10,13 +10,14 @@ import { useState, useActionState } from "react";
 import {Badge} from "@/components/ui/badge";
 import TypingEffect from "@/components/typing-effect";
 import {Skeleton} from "@/components/ui/skeleton";
+import {AIResponseFromAPI} from "@/lib/defintions";
 
-const initialState = {thought: '', summary: '', insight: '', suggestedGoal: '', themes: [], tasks: [] }
+const initialState: AIResponseFromAPI  = { thought: '', summary: '', insight: '', suggestedGoal: '', themes: [], tasks: [] }
 
 export default function AIResponse() {
   const [currentRenderIndex, setCurrentRenderIndex] = useState(0);
   const [state, formAction, pending] =
-    useActionState<Promise<typeof initialState>, typeof initialState>(fetchAIResponse, initialState)
+    useActionState<Promise<AIResponseFromAPI>, FormData>(fetchAIResponse, initialState)
 
   console.log(state)
   return (
