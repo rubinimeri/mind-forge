@@ -9,12 +9,13 @@ import { fetchAIResponse } from '@/app/actions'
 import { useState, useActionState } from "react";
 import {Badge} from "@/components/ui/badge";
 import TypingEffect from "@/components/typing-effect";
+import {Skeleton} from "@/components/ui/skeleton";
 
-const initialState = { result: { thought: '', summary: '', insight: '', suggestedGoal: '', themes: [], tasks: [] } }
+const initialState = {thought: '', summary: '', insight: '', suggestedGoal: '', themes: [], tasks: [] }
 
 export default function AIResponse() {
   const [currentRenderIndex, setCurrentRenderIndex] = useState(0);
-  const [state, formAction] =
+  const [state, formAction, pending] =
     useActionState<Promise<typeof initialState>, typeof initialState>(fetchAIResponse, initialState)
 
   console.log(state)
@@ -34,7 +35,8 @@ export default function AIResponse() {
           </form>
         </CardContent>
       </Card>
-      { state.result.summary && <Card className={"mx-auto max-w-lg mt-8"}>
+      { state.summary &&
+        <Card className={"mx-auto max-w-lg mt-8 animate-[slideUp_0.5s_ease-out_forwards] mb-8"}>
         <CardHeader className={"flex justify-between items-center"}>
           {currentRenderIndex >= 0 && (
             <h2
@@ -67,7 +69,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 3 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.result.summary} onDoneAction={() => setCurrentRenderIndex(4)} />
+              <TypingEffect text={state.summary} onDoneAction={() => setCurrentRenderIndex(4)} />
             </p>
           )}
           {currentRenderIndex >= 4 && (
@@ -78,7 +80,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 5 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.result.insight} onDoneAction={() => setCurrentRenderIndex(6)} />
+              <TypingEffect text={state.insight} onDoneAction={() => setCurrentRenderIndex(6)} />
             </p>
           )}
           {currentRenderIndex >= 6 && (
@@ -89,7 +91,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 7 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.result.suggestedGoal} onDoneAction={() => setCurrentRenderIndex(8)} />
+              <TypingEffect text={state.suggestedGoal} onDoneAction={() => setCurrentRenderIndex(8)} />
             </p>
           )}
           {currentRenderIndex >= 8 && (
@@ -100,7 +102,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 9 && (
             <ul className={"flex flex-wrap gap-3"}>
-              {state.result.themes.map((theme: string, index) =>
+              {state.themes.map((theme: string, index) =>
                 (<Badge key={index} >
                   <TypingEffect text={theme[0].toUpperCase() + theme.slice(1)} onDoneAction={() => setCurrentRenderIndex(10)} />
                 </Badge>))}
@@ -116,7 +118,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 11 && (
           <ul className={"w-full flex flex-col gap-3 justify-start"}>
-            {state.result.tasks.map((task, index) => (
+            {state.tasks.map((task, index) => (
               <li className={"flex justify-between"} key={index}>
                 <p className={"flex gap-2 items-center"}><Dot/>
                   <TypingEffect text={task} onDoneAction={() => setCurrentRenderIndex(11)} />
@@ -136,7 +138,13 @@ export default function AIResponse() {
           </ul>
           )}
         </CardFooter>
-      </Card>}
+      </Card>
+      }
+      { (pending && !state.summary) &&
+        <Card className={"mx-auto max-w-lg mt-8 h-[50svh] py-0 animate-[slideUp_0.5s_ease-out_forwards]"} >
+          <Skeleton className={"h-full bg-gradient-to-r from-muted via-muted-foreground/20 to-muted bg-[length:200%_100%] animate-[shimmer_3s_infinite]"} />
+        </Card>
+      }
     </>
   );
 }

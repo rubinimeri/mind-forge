@@ -65,5 +65,5 @@ export async function fetchAIResponse(data: { result: { thought: string; summary
     contents: `${AIRole} User: ${thought}`,
   });
   console.log(response.text);
-  return { result: cleanAndParse(response.text || "") }
+  return cleanAndParse(response.text || "")
 }
