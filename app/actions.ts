@@ -7,7 +7,6 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import type { AIResponse } from "@/prisma/app/generated/prisma";
 import {AIResponseFromAPI} from "@/lib/defintions";
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
