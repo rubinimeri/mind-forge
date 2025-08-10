@@ -90,10 +90,10 @@ model AIResponse {
 model Task {
   id           String     @unique @default(uuid())
   content      String
-  theme        String
+  theme        String?
   AIResponse   AIResponse @relation(fields: [AIResponseId], references: [id])
   AIResponseId String
   createdAt    DateTime   @default(now())
   column       Column?    @relation(fields: [columnId], references: [id])
-  columnId     String
+  columnId     String?
 }
