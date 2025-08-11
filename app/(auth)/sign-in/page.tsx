@@ -11,9 +11,6 @@ async function Page() {
 
   if (session?.user) redirect("/");
 
-  const background = {
-    background: '#4545ff linear-gradient(45deg, rgba(69, 69, 255, 1) 0%, rgba(0, 212, 255, 1) 100%)'
-  }
   return (
     <Card className={"max-w-md mx-auto shadow-lg"}>
       <CardHeader className={'text-center'}>
