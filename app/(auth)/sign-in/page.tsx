@@ -1,7 +1,7 @@
 import React from 'react';
-import SignInForm from "@/app/(auth)/sign-in/SignInForm";
-import GithubSignIn from "@/components/GithubSignIn";
-import GoogleSignIn from "@/components/GoogleSignIn";
+import SignInForm from "@/app/(auth)/sign-in/sign-in-form";
+import GithubSignIn from "@/components/github-sign-in";
+import GoogleSignIn from "@/components/google-sign-in";
 import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {auth} from "@/auth";
 import {redirect} from "next/navigation";
