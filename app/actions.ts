@@ -8,6 +8,8 @@ import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
 import {AIResponseFromAPI} from "@/lib/defintions";
+import {auth} from "@/auth";
+import {Task} from "@/prisma/app/generated/prisma";
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
   try {
@@ -69,5 +71,41 @@ export async function fetchAIResponse(data: AIResponseFromAPI, formData: FormDat
   return cleanAndParse(response.text || "")
 }
 
-/*
-export async function saveThoughtToDashboard()*/
+export async function saveAIResponseToDashboard(response: AIResponseFromAPI) {
+  const session = await auth()
+  if (!session?.user) return
+
+  const user = await prisma.user.findFirst({where: {id: session.user.id}})
+  if (!user) return
+
+  // First create a thought
+  const thought = await prisma.thought.create({
+    data: {
+      content: response.thought,
+      userId: session.user.id
+    }
+  })
+
+  // Create AIResponse linked to the thought
+  const AIResponse = await prisma.aIResponse.create({
+    data: {
+      thoughtId: thought.id,
+      summary: response.summary,
+      insight: response.insight,
+      suggestedGoal: response.suggestedGoal,
+      themes: response.themes,
+    }
+  })
+
+  // Create tasks linked to the AIResponse
+  const tasks: Task[] = await Promise.all(
+    response.tasks.map(task => prisma.task.create({
+      data: {
+        content: task,
+        AIResponseId: AIResponse.id
+      }
+    }))
+  );
+
+  console.log({ thought, AIResponse, tasks });
+}
