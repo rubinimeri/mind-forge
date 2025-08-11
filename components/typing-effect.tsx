@@ -4,7 +4,7 @@ const DELAY = 25;
 
 export default function TypingEffect({ text, onDoneAction }: {
   text: string;
-  onDoneAction: () => void;
+  onDoneAction?: () => void;
 }) {
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
@@ -17,7 +17,8 @@ export default function TypingEffect({ text, onDoneAction }: {
   }, [displayedText]);
 
   useEffect(() => {
-    if (!isRunning) return onDoneAction();
+    if (!isRunning && onDoneAction) return onDoneAction();
+    if (!isRunning && !onDoneAction) return;
 
     const interval = setInterval(() => {
       setCurrentLetterIndex((prev) => prev + 1);
