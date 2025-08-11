@@ -39,7 +39,7 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
   }
 }
 
-export async function fetchAIResponse(data: AIResponseFromAPI, formData: FormData) {
+export async function fetchAIResponse(data: AIResponseFromAPI | null, formData: FormData) {
   const thought = formData.get("thought");
 
   const AIRole = `
