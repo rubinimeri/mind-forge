@@ -61,6 +61,39 @@ export const { auth, handlers, signOut, signIn } =
         }
       })
     ],
+    events: {
+      async createUser({ user }: { user: User }) {
+        const board = await prisma.board.create({
+          data: {
+            userId: user?.id
+          }
+        })
+
+        await Promise.all([
+          prisma.column.create({
+            data: {
+              title: "To Do",
+              boardId: board?.id,
+              position: 0
+            }
+          }),
+          prisma.column.create({
+            data: {
+              title: "Doing",
+              boardId: board?.id,
+              position: 1
+            }
+          }),
+          prisma.column.create({
+            data: {
+              title: "Done",
+              boardId: board?.id,
+              position: 2
+            }
+          })
+        ])
+      }
+    },
     pages: {
       signIn: "/sign-in",
       error: "/sign-in",
