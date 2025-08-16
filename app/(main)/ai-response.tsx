@@ -3,20 +3,27 @@
 import {Textarea} from "@/components/ui/textarea";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card";
-import {Bot, Dot, FileText, Lightbulb, List, Pin, Tags, Target} from "lucide-react";
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {fetchAIResponse} from '@/app/actions'
+import {Bot, Dot, FileText, Lightbulb, List, Tags, Target} from "lucide-react";
+import {createThought} from '@/app/actions'
 import {useState, useActionState} from "react";
 import {Badge} from "@/components/ui/badge";
 import TypingEffect from "@/components/typing-effect";
 import {Skeleton} from "@/components/ui/skeleton";
-import {AIResponseFromAPI} from "@/lib/defintions";
 import SaveToDashboardButton from "@/components/save-to-dashboard-button";
+import SaveToKanbanButton from "@/components/save-to-kanban-button";
+import {AIResponse, Task, Thought} from "@/prisma/app/generated/prisma";
 
-export default function AIResponse() {
+type ThoughtState = {
+  thought: Thought,
+  AIResponse: AIResponse,
+  tasks: Task[]
+}
+
+export default function AIResponseCard() {
   const [currentRenderIndex, setCurrentRenderIndex] = useState(0);
   const [state, formAction, statePending] =
-    useActionState<Promise<AIResponseFromAPI | null>, FormData>(fetchAIResponse, null)
+    useActionState<Promise<ThoughtState | null>, FormData>(createThought, null)
+
 
   return (
     <>
@@ -50,7 +57,7 @@ export default function AIResponse() {
           {currentRenderIndex >= 1 && (
             <SaveToDashboardButton
               onDoneAction={setCurrentRenderIndex}
-              AIResponseState={state}
+              thoughtId={state.thought.id}
             />
           )}
         </CardHeader>
@@ -63,7 +70,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 3 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.summary} onDoneAction={() => setCurrentRenderIndex(4)} />
+              <TypingEffect text={state.AIResponse.summary} onDoneAction={() => setCurrentRenderIndex(4)} />
             </p>
           )}
           {currentRenderIndex >= 4 && (
@@ -74,7 +81,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 5 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.insight} onDoneAction={() => setCurrentRenderIndex(6)} />
+              <TypingEffect text={state.AIResponse.insight} onDoneAction={() => setCurrentRenderIndex(6)} />
             </p>
           )}
           {currentRenderIndex >= 6 && (
@@ -85,7 +92,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 7 && (
             <p className={"tracking-wider text-sm font-light"}>
-              <TypingEffect text={state.suggestedGoal} onDoneAction={() => setCurrentRenderIndex(8)} />
+              <TypingEffect text={state.AIResponse.suggestedGoal} onDoneAction={() => setCurrentRenderIndex(8)} />
             </p>
           )}
           {currentRenderIndex >= 8 && (
@@ -96,7 +103,7 @@ export default function AIResponse() {
           )}
           {currentRenderIndex >= 9 && (
             <ul className={"flex flex-wrap gap-3"}>
-              {state.themes.map((theme: string, index) =>
+              {state.AIResponse.themes.map((theme: string, index) =>
                 (<Badge key={index} >
                   <TypingEffect text={theme[0].toUpperCase() + theme.slice(1)} onDoneAction={() => setCurrentRenderIndex(10)} />
                 </Badge>))}
@@ -115,18 +122,9 @@ export default function AIResponse() {
             {state.tasks.map((task, index) => (
               <li className={"flex justify-between"} key={index}>
                 <p className={"flex gap-2 items-center"}><Dot/>
-                  <TypingEffect text={task} onDoneAction={() => setCurrentRenderIndex(11)} />
+                  <TypingEffect text={task.content} onDoneAction={() => setCurrentRenderIndex(11)} />
                 </p>
-                <form action="">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button type="submit" variant={"outline"} size={"sm"} className={""}><Pin/></Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Save to Kanban</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </form>
+                <SaveToKanbanButton taskId={task.id} />
               </li>
             ))}
           </ul>

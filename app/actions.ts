@@ -9,7 +9,13 @@ import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
 import {AIResponseFromAPI} from "@/lib/defintions";
 import {auth} from "@/auth";
-import {Task} from "@/prisma/app/generated/prisma";
+import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
+
+type ThoughtState = {
+  thought: Thought,
+  AIResponse: AIResponse,
+  tasks: Task[]
+}
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
   try {
@@ -39,9 +45,7 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
   }
 }
 
-export async function fetchAIResponse(data: AIResponseFromAPI | null, formData: FormData) {
-  const thought = formData.get("thought");
-
+export async function fetchAIResponse(thought: FormDataEntryValue | null): Promise<AIResponseFromAPI> {
   const AIRole = `
       You are a productivity assistant.
 
@@ -71,12 +75,16 @@ export async function fetchAIResponse(data: AIResponseFromAPI | null, formData: 
   return cleanAndParse(response.text || "")
 }
 
-export async function saveAIResponseToDashboard(response: AIResponseFromAPI) {
+export async function createThought(state: ThoughtState | null, formData: FormData): Promise<ThoughtState | null> {
+  const thoughtInput = formData.get("thought");
+
   const session = await auth()
-  if (!session?.user) return
+  if (!session?.user) return null
 
   const user = await prisma.user.findFirst({where: {id: session.user.id}})
-  if (!user) return
+  if (!user) return null
+
+  const response = await fetchAIResponse(thoughtInput);
 
   // First create a thought
   const thought = await prisma.thought.create({
@@ -107,5 +115,53 @@ export async function saveAIResponseToDashboard(response: AIResponseFromAPI) {
     }))
   );
 
-  console.log({ thought, AIResponse, tasks });
+  return { thought, AIResponse, tasks };
+}
+
+export async function saveThoughtToDashboard(thoughtId: string) {
+  const session = await auth()
+  if (!session?.user) return
+
+  const savedThought = await prisma.thought.update({
+    where: {
+      id: thoughtId
+    },
+    data: {
+      saved: true
+    }
+  })
+
+  console.log(savedThought);
+}
+
+export async function saveTaskToKanban(taskId: string) {
+
+  const session = await auth()
+  if (!session?.user) return
+
+  const board = await prisma.board.findFirst({
+    where: { userId: session.user.id },
+    include: {
+      columns: {
+        where: {
+          position: 0
+        }
+      }
+    }
+  })
+
+  if (!board) return
+
+  const toDoColumn = await prisma.column.findFirst({
+    where: { boardId: board?.id, position: 0 }
+  })
+
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: { columnId: toDoColumn?.id }
+  })
+
+  console.log(task);
+
+  return task
 }
