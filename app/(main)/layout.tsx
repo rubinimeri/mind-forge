@@ -7,6 +7,7 @@ import {headers} from "next/headers";
 async function MainLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
   const path = headersList.get("x-pathname");
+  const formattedPath = `${path?.charAt(1).toUpperCase()}${path?.slice(2)}`
 
   return (
     <SidebarProvider>
@@ -18,7 +19,7 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
-          {path === "/" ? "Home" : path?.slice(1)}
+          {path === "/" ? "Home" : formattedPath}
         </header>
         {children}
       </SidebarInset>
