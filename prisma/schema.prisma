@@ -74,6 +74,7 @@ model Thought {
   content    String
   AIResponse AIResponse?
   createdAt  DateTime    @default(now())
+  saved      Boolean     @default(false)
 }
 
 model AIResponse {
@@ -88,12 +89,12 @@ model AIResponse {
 }
 
 model Task {
-  id           String     @unique @default(uuid())
+  id           String      @unique @default(uuid())
   content      String
   theme        String?
-  AIResponse   AIResponse @relation(fields: [AIResponseId], references: [id])
-  AIResponseId String
-  createdAt    DateTime   @default(now())
-  column       Column?    @relation(fields: [columnId], references: [id])
+  AIResponse   AIResponse? @relation(fields: [AIResponseId], references: [id])
+  AIResponseId String?
+  createdAt    DateTime    @default(now())
+  column       Column?     @relation(fields: [columnId], references: [id])
   columnId     String?
 }
