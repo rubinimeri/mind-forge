@@ -14,10 +14,10 @@ export function cleanAndParse(jsonWithBackticks: string) {
   return JSON.parse(cleaned);
 }
 
-export function formatDate(date: Date) {
+export function formatDate(date: string) {
   const prismaDate = new Date(date)
 
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-MK", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(prismaDate);
