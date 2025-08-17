@@ -17,7 +17,7 @@ export function cleanAndParse(jsonWithBackticks: string) {
 export function formatDate(date: string) {
   const prismaDate = new Date(date)
 
-  return new Intl.DateTimeFormat("en-MK", {
+  return new Intl.DateTimeFormat("de-DE", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(prismaDate);
