@@ -3,6 +3,8 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sid
 import {AppSidebar} from "@/components/app-sidebar";
 import {Separator} from "@/components/ui/separator";
 import {headers} from "next/headers";
+import {Input} from "@/components/ui/input";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 
 async function MainLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -19,7 +21,30 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
             orientation="vertical"
             className="mr-2 data-[orientation=vertical]:h-4"
           />
-          {path === "/" ? "Home" : formattedPath}
+          <span className={"tracking-wider text-sm"}>{path === "/" ? "Home" : formattedPath}</span>
+          {path === '/dashboard' && (
+            <>
+              <form className={"ml-auto"} >
+                <Input
+                  className={"placeholder:text-gray-600"}
+                  type={"search"}
+                  placeholder={"Search Thoughts..."}/>
+              </form>
+              <form >
+                <Select defaultValue={"all"} >
+                  <SelectTrigger className="w-[180px] border-inherit border-2 text-gray-600">
+                    <SelectValue placeholder="Filter" className={"text-gray-600"} />
+                  </SelectTrigger>
+                  <SelectContent >
+                    <SelectItem value="all" >All</SelectItem>
+                    <SelectItem value="today">Today</SelectItem>
+                    <SelectItem value="thisWeek">This Week</SelectItem>
+                    <SelectItem value="thisMonth">This Month</SelectItem>
+                  </SelectContent>
+                </Select>
+              </form>
+            </>
+          )}
         </header>
         {children}
       </SidebarInset>
