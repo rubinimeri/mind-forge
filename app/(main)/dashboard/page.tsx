@@ -1,11 +1,11 @@
 import {auth} from "@/auth";
 import {redirect} from "next/navigation";
-import {Quote, Trash} from "lucide-react";
+import {Quote} from "lucide-react";
 import {Card, CardFooter, CardHeader} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
 import {formatDate} from "@/lib/utils";
 import ThoughtDetails from "@/app/(main)/dashboard/thought-details";
 import {getThoughts} from "@/app/actions";
+import DeleteThoughtButton from "@/app/(main)/dashboard/delete-thought-button";
 
 export default async function Home() {
   const session = await auth()
@@ -34,11 +34,7 @@ export default async function Home() {
           <ThoughtDetails thought={thought} />
 
           <CardFooter className={"flex justify-between"} >
-            <form action="">
-              <Button type="submit" size={"sm"} variant="outline" className={"hover:bg-primary dark:hover:bg-primary hover:text-white rounded-full"}>
-                <Trash />
-              </Button>
-            </form>
+            <DeleteThoughtButton thoughtId={thought.id} />
 
             <p className={"tracking-wider text-sm font-light text-gray-500"}>
               {formatDate(thought.createdAt)}

@@ -10,6 +10,7 @@ import {cleanAndParse} from "@/lib/utils";
 import {AIResponseFromAPI, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
+import {revalidatePath} from "next/cache";
 
 type ThoughtState = {
   thought: Thought,
@@ -201,7 +202,7 @@ export async function deleteThought(thoughtId: string) {
         }
     })
 
-    for (const task of thought!.AIResponse!?.tasks) {
+    for (const task of thought?.AIResponse!?.tasks) {
       if (task.columnId)
         await prisma.task.delete({ where: { id: task.id } })
       else
@@ -213,6 +214,8 @@ export async function deleteThought(thoughtId: string) {
 
     await prisma.aIResponse.delete({ where: { thoughtId } })
     await prisma.thought.delete({ where: { id: thoughtId } })
+
+    revalidatePath("/dashboard")
   } catch (error) {
     console.log(error)
   }
