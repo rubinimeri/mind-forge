@@ -7,9 +7,10 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI} from "@/lib/defintions";
+import {AIResponseFromAPI, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
+import {revalidatePath} from "next/cache";
 
 type ThoughtState = {
   thought: Thought,
@@ -164,4 +165,58 @@ export async function saveTaskToKanban(taskId: string) {
   console.log(task);
 
   return task
+}
+
+export async function getThoughts(userId: string): Promise<ThoughtWithAIResponse[] | null>{
+
+  try {
+    return await prisma.thought.findMany({
+      where: { userId },
+      include: {
+        AIResponse: {
+          include: {
+            tasks: true
+          }
+        }
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return null
+  }
+}
+
+export async function deleteThought(thoughtId: string) {
+  try {
+    // Delete tasks related to the thought if they don't
+    // have a column ID
+    const thought =
+      await prisma.thought.findFirst({
+        where: { id: thoughtId },
+        include: {
+          AIResponse: {
+            include: {
+              tasks: true
+            }
+          }
+        }
+    })
+
+    for (const task of thought?.AIResponse!?.tasks) {
+      if (task.columnId)
+        await prisma.task.delete({ where: { id: task.id } })
+      else
+        await prisma.task.update({
+          where: { id: task.id },
+          data: { AIResponseId: null }
+        })
+    }
+
+    await prisma.aIResponse.delete({ where: { thoughtId } })
+    await prisma.thought.delete({ where: { id: thoughtId } })
+
+    revalidatePath("/dashboard")
+  } catch (error) {
+    console.log(error)
+  }
 }

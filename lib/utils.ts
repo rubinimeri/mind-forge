@@ -13,3 +13,12 @@ export function cleanAndParse(jsonWithBackticks: string) {
 
   return JSON.parse(cleaned);
 }
+
+export function formatDate(date: Date) {
+  const prismaDate = new Date(date)
+
+  return new Intl.DateTimeFormat("en-US", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(prismaDate);
+}
