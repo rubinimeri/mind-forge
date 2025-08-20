@@ -184,3 +184,36 @@ export async function getThoughts(userId: string): Promise<ThoughtWithAIResponse
     return null
   }
 }
+
+export async function deleteThought(thoughtId: string) {
+  try {
+    // Delete tasks related to the thought if they don't
+    // have a column ID
+    const thought =
+      await prisma.thought.findFirst({
+        where: { id: thoughtId },
+        include: {
+          AIResponse: {
+            include: {
+              tasks: true
+            }
+          }
+        }
+    })
+
+    for (const task of thought!.AIResponse!?.tasks) {
+      if (task.columnId)
+        await prisma.task.delete({ where: { id: task.id } })
+      else
+        await prisma.task.update({
+          where: { id: task.id },
+          data: { AIResponseId: null }
+        })
+    }
+
+    await prisma.aIResponse.delete({ where: { thoughtId } })
+    await prisma.thought.delete({ where: { id: thoughtId } })
+  } catch (error) {
+    console.log(error)
+  }
+}
