@@ -7,7 +7,7 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI} from "@/lib/defintions";
+import {AIResponseFromAPI, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
 
@@ -164,4 +164,23 @@ export async function saveTaskToKanban(taskId: string) {
   console.log(task);
 
   return task
+}
+
+export async function getThoughts(userId: string): Promise<ThoughtWithAIResponse[] | null>{
+
+  try {
+    return await prisma.thought.findMany({
+      where: { userId },
+      include: {
+        AIResponse: {
+          include: {
+            tasks: true
+          }
+        }
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return null
+  }
 }
