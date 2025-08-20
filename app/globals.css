@@ -175,6 +175,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  h1 {
+    @apply mx-auto text-primary max-w-2xl text-4xl font-semibold tracking-tight text-balance lg:leading-[1.1] lg:font-semibold xl:text-5xl xl:tracking-tighter text-center
+  }
   h3 {
     @apply text-secondary text-lg font-light tracking-tight text-balance xl:tracking-tighter flex items-center gap-1;
   }
