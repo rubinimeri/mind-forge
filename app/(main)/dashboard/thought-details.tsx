@@ -1,21 +1,17 @@
 "use client"
 
-import {AIResponse, Task, Thought} from "@/prisma/app/generated/prisma";
 import {Check, ChevronDown, ChevronUp, Dot, FileText, Lightbulb, List, Tags, Target} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import SaveToKanbanButton from "@/components/save-to-kanban-button";
 import {CardContent} from "@/components/ui/card";
 import {useState} from "react";
 import {Button} from "@/components/ui/button";
+import {ThoughtWithAIResponse} from "@/lib/defintions";
 
-type ThoughtWithResponse = Omit<Thought, "createdAt"> & {
-  createdAt: string;
-  AIResponse: AIResponse & {
-    tasks: (Omit<Task, "createdAt"> & { createdAt: string })[];
-  }
-}
+function ThoughtDetails({ thought }: { thought: ThoughtWithAIResponse }) {
 
-function ThoughtDetails({ thought }: { thought: ThoughtWithResponse }) {
+  if (!thought || !thought.AIResponse) return null
+
   const [showMore, setShowMore] = useState(false)
 
   if (!showMore)

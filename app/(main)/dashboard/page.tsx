@@ -5,23 +5,30 @@ import {Card, CardFooter, CardHeader} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import {formatDate} from "@/lib/utils";
 import ThoughtDetails from "@/app/(main)/dashboard/thought-details";
-import { placeholderThoughtData } from "@/lib/placeholder-data";
+import {getThoughts} from "@/app/actions";
 
 export default async function Home() {
   const session = await auth()
 
   if (!session?.user) redirect("/sign-in");
 
+  const thoughts = await getThoughts(session?.user.id);
+
+  if (!thoughts)
+    return (
+      <h1 className={"mt-4 text-secondary font-light"}>No thoughts yet...</h1>
+    )
+
   return (
     <div className={"flex flex-wrap gap-4 p-4 items-start"}>
-      {placeholderThoughtData.map((thought) => (
+      {thoughts.map((thought) => (
         <Card className={"grid grid-cols-1 basis-[600px] max-w-[600px] grow-1"} key={thought.id}>
-          <CardHeader key={thought.id} className={"self-center"}>
-            <h3 className={"italic text-center flex items-start gap-1 text-xl tracking-wide"}>
-              <Quote strokeWidth={1} size={40} className={"transform rotate-180 fill-primary stroke-primary"}/>
+          <CardHeader key={thought.id} className={"self-center flex justify-between items-start gap-1"}>
+            <Quote strokeWidth={1} className={"transform rotate-180 fill-primary stroke-primary text-[40px] shrink-0"}/>
+            <h3 className={"italic text-xl tracking-wide text-center"}>
               {thought.content}
-              <Quote fill={"black"} strokeWidth={1} size={40} className={"self-end fill-primary stroke-primary"}/>
             </h3>
+            <Quote strokeWidth={1} className={"self-end fill-primary stroke-primary text-[40px] shrink-0"}/>
           </CardHeader>
 
           <ThoughtDetails thought={thought} />
