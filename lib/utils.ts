@@ -14,6 +14,18 @@ export function cleanAndParse(jsonWithBackticks: string) {
   return JSON.parse(cleaned);
 }
 
+export const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+});
+export const shortDateFormatter = new Intl.DateTimeFormat('en-US', {
+  month: 'short',
+  day: 'numeric',
+});
+
 export function formatDate(date: Date) {
   const prismaDate = new Date(date)
 
