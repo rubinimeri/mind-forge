@@ -18,6 +18,12 @@ export type ThoughtWithAIResponse = Prisma.ThoughtGetPayload<{
   };
 }>;
 
+export type KanbanColumn = {
+  id: string
+  name: string
+  color: string
+}
+
 export type KanbanTask = {
   id: string;
   column: string;
