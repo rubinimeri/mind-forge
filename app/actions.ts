@@ -221,6 +221,30 @@ export async function deleteThought(thoughtId: string) {
   }
 }
 
+export async function getColumns(userId: string) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      select: {
+        columns: {
+          orderBy: {
+            position: "asc"
+          }
+        },
+      },
+    });
+
+    return board?.columns.map((column) => ({
+      id: column.id,
+      name: column.title,
+      color: column.position === 0 ? "red" : column.position === 1 ? "yellow" : "green"
+    })) ?? []
+  } catch (err) {
+    console.log(err)
+    return []
+  }
+}
+
 export async function getSavedTasks(userId: string) {
   try {
     const board = await prisma.board.findFirst({
