@@ -6,12 +6,30 @@ import {
   KanbanHeader,
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
-import { useState } from 'react';
-import { columns, exampleTasks } from "@/lib/placeholder-data";
-import {dateFormatter, shortDateFormatter} from "@/lib/utils";
+import {useEffect, useState} from 'react';
+import { columns } from "@/lib/placeholder-data";
+import {dateFormatter} from "@/lib/utils";
+import {getSavedTasks} from "@/app/actions";
+import {KanbanTask} from "@/lib/defintions";
 
-const Kanban = () => {
-  const [tasks, setTasks] = useState(exampleTasks);
+const Kanban = ({ userId }: { userId: string }) => {
+  const [tasks, setTasks] = useState<KanbanTask[]>([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await getSavedTasks(userId);
+        console.log(response);
+        setTasks(response);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    fetchTasks();
+  }, []);
+
+
   return (
     <KanbanProvider
       columns={columns}
@@ -44,10 +62,11 @@ const Kanban = () => {
                     </p>
                   </div>
                 </div>
-                <p className="m-0 text-muted-foreground text-xs">
-                  {shortDateFormatter.format(task.startAt)} -{' '}
-                  {dateFormatter.format(task.endAt)}
-                </p>
+                <div className={"flex justify-between items-end"}>
+                  <p className="m-0 text-muted-foreground text-xs">
+                    {dateFormatter.format(task.createdAt)}
+                  </p>
+                </div>
               </KanbanCard>
             )}
           </KanbanCards>

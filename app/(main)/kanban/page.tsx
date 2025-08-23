@@ -21,7 +21,7 @@ async function Page() {
         </Button>
         <Button variant={"secondary"} size={"sm"} className={"gap-1 cursor-pointer text-[12px]"} > <Plus />New Task </Button>
       </div>
-      <Kanban />
+      <Kanban userId={session.user.id} />
     </div>
   );
 }
