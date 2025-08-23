@@ -7,15 +7,25 @@ import {
   KanbanProvider,
 } from '@/components/ui/shadcn-io/kanban';
 import {useEffect, useState} from 'react';
-import { columns } from "@/lib/placeholder-data";
 import {dateFormatter} from "@/lib/utils";
-import {getSavedTasks} from "@/app/actions";
-import {KanbanTask} from "@/lib/defintions";
+import {getColumns, getSavedTasks} from "@/app/actions";
+import {KanbanColumn, KanbanTask} from "@/lib/defintions";
 
 const Kanban = ({ userId }: { userId: string }) => {
   const [tasks, setTasks] = useState<KanbanTask[]>([]);
+  const [columns, setColumns] = useState<KanbanColumn[]>([])
 
   useEffect(() => {
+    const fetchColumns = async () => {
+      try {
+        const columns = await getColumns(userId)
+        console.log(columns)
+        setColumns(columns);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
     const fetchTasks = async () => {
       try {
         const response = await getSavedTasks(userId);
@@ -26,6 +36,7 @@ const Kanban = ({ userId }: { userId: string }) => {
       }
     }
 
+    fetchColumns();
     fetchTasks();
   }, []);
 
