@@ -7,7 +7,7 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI, ThoughtWithAIResponse} from "@/lib/defintions";
+import {AIResponseFromAPI, KanbanTask, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
 import {revalidatePath} from "next/cache";
@@ -218,5 +218,30 @@ export async function deleteThought(thoughtId: string) {
     revalidatePath("/dashboard")
   } catch (error) {
     console.log(error)
+  }
+}
+
+export async function getSavedTasks(userId: string) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      include: { columns: true }
+    })
+    const tasks = await prisma.task.findMany({
+      where: {
+        columnId: {
+          in: board?.columns.map(c => c.id),
+        }
+      }
+    })
+    return tasks.map(task => ({
+      id: task.id,
+      column: task.columnId as string,
+      name: task.content,
+      createdAt: task.createdAt,
+    }))
+  } catch (error) {
+    console.log(error)
+    return []
   }
 }
