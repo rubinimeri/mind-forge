@@ -1,4 +1,4 @@
-import {AIResponse, Prisma} from "@/prisma/app/generated/prisma";
+import {Column, Prisma, Task} from "@/prisma/app/generated/prisma";
 export type AIResponseFromAPI = {
   thought: string;
   summary: string;
@@ -17,3 +17,10 @@ export type ThoughtWithAIResponse = Prisma.ThoughtGetPayload<{
     };
   };
 }>;
+
+export type KanbanTask = {
+  id: string;
+  column: string;
+  name: string;
+  createdAt: Date;
+};
