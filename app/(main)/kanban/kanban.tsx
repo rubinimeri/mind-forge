@@ -8,13 +8,16 @@ import {
 } from '@/components/ui/shadcn-io/kanban';
 import {useEffect, useState} from 'react';
 import {dateFormatter} from "@/lib/utils";
-import {getColumns, getSavedTasks} from "@/app/actions";
+import {deleteTask, getColumns, getSavedTasks} from "@/app/actions";
 import {KanbanColumn, KanbanTask} from "@/lib/defintions";
 import EditTaskForm from "@/app/(main)/kanban/edit-task-form";
+import {Button} from "@/components/ui/button";
+import {Loader, Trash} from "lucide-react";
 
 const Kanban = ({ userId }: { userId: string }) => {
   const [tasks, setTasks] = useState<KanbanTask[]>([]);
   const [columns, setColumns] = useState<KanbanColumn[]>([])
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     const fetchColumns = async () => {
@@ -56,6 +59,18 @@ const Kanban = ({ userId }: { userId: string }) => {
     setTasks(newTasks);
   }
 
+  const handleDelete = async (taskId: string) => {
+    setLoading(true);
+    try {
+      await deleteTask(taskId);
+      setTasks(tasks.filter((task) => task.id !== taskId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <KanbanProvider
       columns={columns}
@@ -86,6 +101,18 @@ const Kanban = ({ userId }: { userId: string }) => {
                     taskTitle={task.name}
                     onEdit={onEdit}
                   />
+                }
+                deleteButton={
+                  <Button
+                    variant={"outline"}
+                    size={"sm"}
+                    disabled={loading}
+                    onClick={() => handleDelete(task.id)}
+                    className={"absolute bottom-[5px] right-9 !p-0 border-none hover:bg-card"}>
+                    {loading ?
+                      <Loader className={"animate-spin"} /> :
+                      <Trash/>}
+                  </Button>
                 }
               >
                 <div className="flex items-start justify-between gap-2">

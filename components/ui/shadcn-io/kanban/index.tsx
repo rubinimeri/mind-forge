@@ -92,6 +92,7 @@ export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
   children?: ReactNode;
   className?: string;
   editButton?: ReactNode;
+  deleteButton?: ReactNode;
 };
 
 export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
@@ -99,6 +100,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   name,
   children,
   editButton,
+  deleteButton,
   className,
 }: KanbanCardProps<T>) => {
   const {
@@ -132,6 +134,7 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
             {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
           </Card>
         </div>
+        {deleteButton}
         {editButton}
       </div>
       {activeCardId === id && (
