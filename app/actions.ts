@@ -269,3 +269,18 @@ export async function getSavedTasks(userId: string) {
     return []
   }
 }
+
+export async function editTask(taskId: string, content: string, theme = null) {
+  try {
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        content,
+        theme
+      }
+    })
+    console.log(updatedTask)
+  } catch (err) {
+    console.log(err)
+  }
+}
