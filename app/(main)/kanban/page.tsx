@@ -4,6 +4,7 @@ import Link from "next/link";
 import {ArrowLeft, Plus} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import Kanban from "@/app/(main)/kanban/kanban";
+import NewTaskForm from "@/app/(main)/kanban/new-task-form";
 
 async function Page() {
   const session = await auth()
@@ -19,7 +20,7 @@ async function Page() {
             Back to Dashboard
           </Link>
         </Button>
-        <Button variant={"secondary"} size={"sm"} className={"gap-1 cursor-pointer text-[12px]"} > <Plus />New Task </Button>
+        <NewTaskForm userId={session.user.id} />
       </div>
       <Kanban userId={session.user.id} />
     </div>
