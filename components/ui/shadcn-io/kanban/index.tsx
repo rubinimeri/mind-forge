@@ -91,12 +91,14 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
 export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
   children?: ReactNode;
   className?: string;
+  editButton?: ReactNode;
 };
 
 export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
   id,
   name,
   children,
+  editButton,
   className,
 }: KanbanCardProps<T>) => {
   const {
@@ -118,16 +120,19 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 
   return (
     <>
-      <div style={style} {...listeners} {...attributes} ref={setNodeRef}>
-        <Card
-          className={cn(
-            'cursor-grab gap-4 rounded-md p-3 shadow-sm',
-            isDragging && 'pointer-events-none cursor-grabbing opacity-30',
-            className
-          )}
-        >
-          {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
-        </Card>
+      <div className={"relative"}>
+        <div style={style} {...listeners} {...attributes} ref={setNodeRef}>
+          <Card
+            className={cn(
+              'cursor-grab gap-4 rounded-md p-3 shadow-sm',
+              isDragging && 'pointer-events-none cursor-grabbing opacity-30',
+              className
+            )}
+          >
+            {children ?? <p className="m-0 font-medium text-sm">{name}</p>}
+          </Card>
+        </div>
+        {editButton}
       </div>
       {activeCardId === id && (
         <t.In>
