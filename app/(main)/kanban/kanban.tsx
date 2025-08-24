@@ -9,13 +9,14 @@ import {
 import {useEffect, useState} from 'react';
 import {dateFormatter} from "@/lib/utils";
 import {deleteTask, getColumns, getSavedTasks} from "@/app/actions";
-import {KanbanColumn, KanbanTask} from "@/lib/defintions";
+import {KanbanColumn} from "@/lib/defintions";
 import EditTaskForm from "@/app/(main)/kanban/edit-task-form";
 import {Button} from "@/components/ui/button";
 import {Loader, Trash} from "lucide-react";
+import {useTasksStore} from "@/lib/store";
 
 const Kanban = ({ userId }: { userId: string }) => {
-  const [tasks, setTasks] = useState<KanbanTask[]>([]);
+  const { tasks, setTasks } = useTasksStore()
   const [columns, setColumns] = useState<KanbanColumn[]>([])
   const [loading, setLoading] = useState(false)
 
