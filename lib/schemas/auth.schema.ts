@@ -21,7 +21,5 @@ export const signInSchema = z
 
 export const editTaskSchema = z.object({
   title: z.string().min(1),
-  themes: z.array(z.string()).min(1, {
-    error: "Please select at least one item"
-  }).optional(),
+  themes: z.array(z.string()).optional(),
 });
