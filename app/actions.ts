@@ -304,12 +304,18 @@ export async function createTask(userId: string, content: string, theme: [string
       where: {boardId: board?.id, position: 0},
       select: {id: true}
     })
-    await prisma.task.create({
+    const task = await prisma.task.create({
       data: {
         content,
         columnId: todoColumn?.id,
       }
     })
+    return {
+      id: task.id,
+      column: task.columnId as string,
+      name: task.content,
+      createdAt: task.createdAt,
+    }
   } catch (error) {
     console.log(error)
   }
