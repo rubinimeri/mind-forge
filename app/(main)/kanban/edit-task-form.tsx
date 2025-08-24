@@ -17,7 +17,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import {
-  Dialog, DialogClose,
+  Dialog,
   DialogContent,
   DialogDescription, DialogFooter,
   DialogHeader,
@@ -51,7 +51,7 @@ export default function EditTaskForm({ taskId, taskTitle, onEdit }: EditTaskForm
     resolver: zodResolver(editTaskSchema),
     defaultValues: {
       "title": taskTitle,
-      "themes": ["test"]
+      "themes": []
     },
   })
 
@@ -72,7 +72,7 @@ export default function EditTaskForm({ taskId, taskTitle, onEdit }: EditTaskForm
     <Form {...form}>
       <Dialog open={open} onOpenChange={setOpen} >
 
-          <DialogClose className={"absolute right-3 bottom-[12px]"} onClick={() => setOpen(true)}>
+          <DialogTrigger className={"absolute right-3 bottom-[12px]"} onClick={() => setOpen(true)}>
               <Button
               variant={"outline"}
               className={"border-none items-end p-0 size-4 hover:bg-card"}
@@ -80,7 +80,7 @@ export default function EditTaskForm({ taskId, taskTitle, onEdit }: EditTaskForm
               >
                 <Edit/>
               </Button>
-          </DialogClose>
+          </DialogTrigger>
 
           <DialogContent>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
