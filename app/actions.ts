@@ -291,3 +291,26 @@ export async function deleteTask(taskId: string) {
     console.log(err)
   }
 }
+
+export async function createTask(userId: string, content: string, theme: [string] | null = null) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: {userId},
+      select: {
+        id: true
+      },
+    });
+    const todoColumn = await prisma.column.findFirst({
+      where: {boardId: board?.id, position: 0},
+      select: {id: true}
+    })
+    await prisma.task.create({
+      data: {
+        content,
+        columnId: todoColumn?.id,
+      }
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
