@@ -10,6 +10,7 @@ import {useEffect, useState} from 'react';
 import {dateFormatter} from "@/lib/utils";
 import {getColumns, getSavedTasks} from "@/app/actions";
 import {KanbanColumn, KanbanTask} from "@/lib/defintions";
+import EditTaskForm from "@/app/(main)/kanban/edit-task-form";
 
 const Kanban = ({ userId }: { userId: string }) => {
   const [tasks, setTasks] = useState<KanbanTask[]>([]);
@@ -40,6 +41,20 @@ const Kanban = ({ userId }: { userId: string }) => {
     fetchTasks();
   }, []);
 
+  const onEdit = (taskId: string, taskTitle: string) => {
+    // Find task
+    const task = tasks.find((task) => task.id === taskId);
+    const taskIndex = tasks.findIndex((task) => task.id === taskId);
+    console.log(task, taskIndex);
+    if (!task)
+      return console.log("Error: failed to edit task");
+
+    task.name = taskTitle;
+    const newTasks = [...tasks];
+    newTasks[taskIndex] = task;
+    console.log(newTasks[taskIndex])
+    setTasks(newTasks);
+  }
 
   return (
     <KanbanProvider
@@ -65,6 +80,13 @@ const Kanban = ({ userId }: { userId: string }) => {
                 id={task.id}
                 key={task.id}
                 name={task.name}
+                editButton={
+                  <EditTaskForm
+                    taskId={task.id}
+                    taskTitle={task.name}
+                    onEdit={onEdit}
+                  />
+                }
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex flex-col gap-1">
@@ -87,3 +109,6 @@ const Kanban = ({ userId }: { userId: string }) => {
   );
 };
 export default Kanban;
+
+
+
