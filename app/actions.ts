@@ -320,3 +320,14 @@ export async function createTask(userId: string, content: string, theme: [string
     console.log(error)
   }
 }
+
+export async function changeTaskColumn(columnId: string, taskId: string) {
+  try {
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { columnId: columnId },
+    })
+  } catch (err) {
+    console.log(err)
+  }
+}
