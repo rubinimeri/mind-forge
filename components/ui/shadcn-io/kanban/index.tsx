@@ -1,11 +1,11 @@
 'use client';
 
-import type {
+import {
   Announcements,
   DndContextProps,
   DragEndEvent,
   DragOverEvent,
-  DragStartEvent,
+  DragStartEvent
 } from '@dnd-kit/core';
 import {
   closestCenter,
@@ -32,6 +32,7 @@ import tunnel from 'tunnel-rat';
 import { Card } from '@/components/ui/card';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import {changeTaskColumn} from "@/app/actions";
 
 const t = tunnel();
 
@@ -234,7 +235,7 @@ export const KanbanProvider = <
     onDragStart?.(event);
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = async (event: DragOverEvent) => {
     const { active, over } = event;
 
     if (!over) {
@@ -262,6 +263,7 @@ export const KanbanProvider = <
       newData[activeIndex].column = overColumn;
       newData = arrayMove(newData, activeIndex, overIndex);
 
+      await changeTaskColumn(overColumn, activeItem.id)
       onDataChange?.(newData);
     }
 

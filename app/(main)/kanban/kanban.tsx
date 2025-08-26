@@ -24,7 +24,6 @@ const Kanban = ({ userId }: { userId: string }) => {
     const fetchColumns = async () => {
       try {
         const columns = await getColumns(userId)
-        console.log(columns)
         setColumns(columns);
       } catch (err) {
         console.error(err);
@@ -34,7 +33,6 @@ const Kanban = ({ userId }: { userId: string }) => {
     const fetchTasks = async () => {
       try {
         const response = await getSavedTasks(userId);
-        console.log(response);
         setTasks(response);
       } catch (err) {
         console.error(err);
