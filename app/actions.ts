@@ -7,7 +7,7 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI, ThoughtWithAIResponse} from "@/lib/defintions";
+import {AIResponseFromAPI, KanbanTask, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
 import {revalidatePath} from "next/cache";
@@ -218,5 +218,116 @@ export async function deleteThought(thoughtId: string) {
     revalidatePath("/dashboard")
   } catch (error) {
     console.log(error)
+  }
+}
+
+export async function getColumns(userId: string) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      select: {
+        columns: {
+          orderBy: {
+            position: "asc"
+          }
+        },
+      },
+    });
+
+    return board?.columns.map((column) => ({
+      id: column.id,
+      name: column.title,
+      color: column.position === 0 ? "red" : column.position === 1 ? "yellow" : "green"
+    })) ?? []
+  } catch (err) {
+    console.log(err)
+    return []
+  }
+}
+
+export async function getSavedTasks(userId: string) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      include: { columns: true }
+    })
+    const tasks = await prisma.task.findMany({
+      where: {
+        columnId: {
+          in: board?.columns.map(c => c.id),
+        }
+      }
+    })
+    return tasks.map(task => ({
+      id: task.id,
+      column: task.columnId as string,
+      name: task.content,
+      createdAt: task.createdAt,
+    }))
+  } catch (error) {
+    console.log(error)
+    return []
+  }
+}
+
+export async function editTask(taskId: string, content: string, theme: [string] | null = null) {
+  try {
+    const updatedTask = await prisma.task.update({
+      where: { id: taskId },
+      data: {
+        content,
+      }
+    })
+    console.log(updatedTask)
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export async function deleteTask(taskId: string) {
+  try {
+    await prisma.task.delete({ where: { id: taskId } })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export async function createTask(userId: string, content: string, theme: [string] | null = null) {
+  try {
+    const board = await prisma.board.findFirst({
+      where: {userId},
+      select: {
+        id: true
+      },
+    });
+    const todoColumn = await prisma.column.findFirst({
+      where: {boardId: board?.id, position: 0},
+      select: {id: true}
+    })
+    const task = await prisma.task.create({
+      data: {
+        content,
+        columnId: todoColumn?.id,
+      }
+    })
+    return {
+      id: task.id,
+      column: task.columnId as string,
+      name: task.content,
+      createdAt: task.createdAt,
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function changeTaskColumn(columnId: string, taskId: string) {
+  try {
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { columnId: columnId },
+    })
+  } catch (err) {
+    console.log(err)
   }
 }

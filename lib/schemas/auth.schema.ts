@@ -18,3 +18,8 @@ export const signInSchema = z
     email: z.email({ error: 'Email is required.' }),
     password: z.string({ error: 'Password is required'}).min(8, { error: 'Password must be at least 8 characters.' }),
   })
+
+export const editTaskSchema = z.object({
+  title: z.string().min(1),
+  themes: z.array(z.string()).optional(),
+});
