@@ -19,6 +19,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 import {chartData} from "@/lib/placeholder-data";
+import {cn} from "@/lib/utils";
 
 const chartConfig = {
   thoughtsCaptured: {
@@ -27,12 +28,12 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function ThoughtsChartArea() {
+export default function ThoughtsChartArea({ className }: { className?: string }) {
 
   const reversedData = [...chartData].reverse();
 
   return (
-    <Card className="pt-0">
+    <Card className={cn("", className)}>
       <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Thoughts Captured</CardTitle>
@@ -57,7 +58,7 @@ export default function ThoughtsChartArea() {
                 <stop
                   offset="95%"
                   stopColor="var(--color-thoughtsCaptured)"
-                  stopOpacity={0.1}
+                  stopOpacity={0}
                 />
               </linearGradient>
             </defs>
@@ -97,6 +98,7 @@ export default function ThoughtsChartArea() {
               fill="url(#fillChart)"
               stroke="var(--color-thoughtsCaptured)"
               stackId="a"
+              baseValue={chartData[0].thoughtsCaptured}
             />
             <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
