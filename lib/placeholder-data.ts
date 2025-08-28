@@ -266,7 +266,7 @@ export const exampleTasks = Array.from({ length: 20 })
   }));
 
 export const chartData = Array.from({ length: 90 })
-.fill(null)
+  .fill(null)
   .map((value, daysToSubtract) => {
     const today = new Date();
     const date = new Date(today.getTime() - daysToSubtract * 24 * 60 * 60 * 1000)
@@ -275,6 +275,29 @@ export const chartData = Array.from({ length: 90 })
       month: "short",
         day: "numeric",
     }),
-      thoughtsCaptured: Math.floor(Math.random() * 11)
+      thoughtsCaptured: Math.floor(Math.random() * 10 + 1)
     }
   })
+
+export const barChartData = [
+  {
+    theme: "Productivity",
+    count: Math.floor(Math.random() * 11)
+  },
+  {
+    theme: "Finance",
+    count: Math.floor(Math.random() * 11)
+  },
+  {
+    theme: "Health",
+    count: Math.floor(Math.random() * 11)
+  },
+  {
+    theme: "Faith",
+    count: Math.floor(Math.random() * 11)
+  },
+  {
+    theme: "Fitness",
+    count: Math.floor(Math.random() * 11)
+  }
+]
