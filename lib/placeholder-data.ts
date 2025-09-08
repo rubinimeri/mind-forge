@@ -265,16 +265,16 @@ export const exampleTasks = Array.from({ length: 20 })
     createdAt: faker.date.past({ years: 0.5, refDate: new Date() }),
   }));
 
-export const chartData = Array.from({ length: 90 })
+export const chartData = Array.from({ length: 7 })
   .fill(null)
   .map((value, daysToSubtract) => {
     const today = new Date();
     const date = new Date(today.getTime() - daysToSubtract * 24 * 60 * 60 * 1000)
     return {
       date: date.toLocaleDateString("en-US", {
-      month: "short",
-        day: "numeric",
-    }),
+        month: "short",
+          day: "numeric",
+      }),
       thoughtsCaptured: Math.floor(Math.random() * 10 + 1)
     }
   })
