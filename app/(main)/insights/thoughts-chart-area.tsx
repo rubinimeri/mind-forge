@@ -20,21 +20,18 @@ import {
 } from "@/components/ui/chart"
 import {chartData} from "@/lib/placeholder-data";
 import {cn} from "@/lib/utils";
+import {AreaChartData} from "@/lib/defintions";
 
 const chartConfig = {
-  thoughtsCaptured: {
+  count: {
     label: "Thoughts",
-    color: "var(--chart-2)",
   },
 } satisfies ChartConfig
 
-export default function ThoughtsChartArea({ className }: { className?: string }) {
-
-  const reversedData = [...chartData].reverse();
-
+export default function ThoughtsChartArea({ className, chartData }: { className?: string, chartData: AreaChartData | undefined }) {
   return (
     <Card className={cn("", className)}>
-      <CardHeader className="flex items-center gap-2 space-y-0 border-b py-5 sm:flex-row">
+      <CardHeader className="flex items-center gap-2 space-y-0 border-b sm:flex-row">
         <div className="grid flex-1 gap-1">
           <CardTitle>Thoughts Captured</CardTitle>
           <CardDescription>
@@ -43,26 +40,26 @@ export default function ThoughtsChartArea({ className }: { className?: string })
         </div>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
-        <ChartContainer
+        {chartData && <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={reversedData}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="fillChart" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
-                  stopColor="var(--color-thoughtsCaptured)"
+                  stopColor="var(--chart-2)"
                   stopOpacity={0.8}
                 />
                 <stop
                   offset="95%"
-                  stopColor="var(--color-thoughtsCaptured)"
+                  stopColor="var(--chart-2)"
                   stopOpacity={0}
                 />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false}/>
             <XAxis
               dataKey="date"
               tickLine={false}
@@ -70,8 +67,7 @@ export default function ThoughtsChartArea({ className }: { className?: string })
               tickMargin={8}
               minTickGap={32}
               tickFormatter={(value) => {
-                const date = new Date(value)
-                return date.toLocaleDateString("en-US", {
+                return value.toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                 })
@@ -82,27 +78,22 @@ export default function ThoughtsChartArea({ className }: { className?: string })
               content={
                 <ChartTooltipContent
                   label={"Thoughts Captured"}
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }}
                   indicator="dot"
+                  hideLabel={true}
                 />
               }
             />
             <Area
-              dataKey="thoughtsCaptured"
+              dataKey="count"
               type="natural"
               fill="url(#fillChart)"
-              stroke="var(--color-thoughtsCaptured)"
+              stroke="var(--chart-2)"
               stackId="a"
-              baseValue={chartData[0].thoughtsCaptured}
+              baseValue={chartData[0].count}
             />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend content={<ChartLegendContent/>}/>
           </AreaChart>
-        </ChartContainer>
+        </ChartContainer>}
       </CardContent>
     </Card>
   )
