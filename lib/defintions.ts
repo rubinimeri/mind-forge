@@ -35,3 +35,8 @@ export type AreaChartData = {
   date: Date;
   count: number;
 }[];
+
+export type BarChartData = {
+  theme: string;
+  count: number;
+}[]
