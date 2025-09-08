@@ -7,7 +7,7 @@ import {signUpSchema} from "@/lib/schemas/auth.schema";
 import {prisma} from "@/lib/prisma";
 import {generateSalt, hashAndSaltPassword} from "@/utils/password";
 import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI, KanbanTask, ThoughtWithAIResponse} from "@/lib/defintions";
+import {AIResponseFromAPI, AreaChartData, ThoughtWithAIResponse} from "@/lib/defintions";
 import {auth} from "@/auth";
 import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
 import {revalidatePath} from "next/cache";
@@ -327,6 +327,23 @@ export async function changeTaskColumn(columnId: string, taskId: string) {
       where: { id: taskId },
       data: { columnId: columnId },
     })
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export async function thoughtsCreatedPerDay(): Promise<AreaChartData | undefined> {
+  try {
+    // Get a list of unique dates
+    // for each date see how many thoughts were created on that date
+    // return a date and a count
+
+    return await prisma.$queryRaw`
+      SELECT DATE("createdAt") as date, COUNT(*)::int as count
+      FROM "Thought"
+      GROUP BY DATE("createdAt")
+      ORDER BY date;
+    `;
   } catch (err) {
     console.log(err)
   }
