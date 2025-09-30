@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import {ToggleThemeButton} from "@/components/toggle-theme-button";
 
 async function MainLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -33,6 +34,7 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
             className="mr-2 data-[orientation=vertical]:h-4"
           />
           <span className={"tracking-wider text-sm"}>{path === "/" ? "Home" : formattedPath}</span>
+          <ToggleThemeButton />
           {path === '/dashboard' && (
             <>
               <form className={"ml-auto"} >

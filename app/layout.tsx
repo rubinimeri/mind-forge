@@ -1,5 +1,6 @@
 import React from "react";
 import type { Metadata } from "next";
+import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
 
 import "./globals.css";
@@ -20,11 +21,18 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.className} antialiased`}
       >
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

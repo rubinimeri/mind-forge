@@ -7,7 +7,6 @@ import {
   Kanban
 } from "lucide-react";
 
-import Logo from "@/components/logo";
 import {
   Sidebar,
   SidebarContent, SidebarFooter,
