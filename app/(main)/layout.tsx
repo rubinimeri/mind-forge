@@ -1,10 +1,21 @@
 import React from 'react';
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/app-sidebar";
-import {Separator} from "@/components/ui/separator";
-import {headers} from "next/headers";
-import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { headers } from "next/headers";
+
+import { AppSidebar } from "@/components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger
+} from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 
 async function MainLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();

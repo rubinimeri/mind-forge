@@ -29,8 +29,8 @@ import {
 import SignOutButton from "@/components/sign-out-button";
 
 export function NavUser({
-                          user,
-                        }: {
+  user,
+}: {
   user: {
     name: string
     email: string

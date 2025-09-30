@@ -1,11 +1,17 @@
-import {auth} from "@/auth";
-import {redirect} from "next/navigation";
-import {Quote} from "lucide-react";
-import {Card, CardFooter, CardHeader} from "@/components/ui/card";
-import {formatDate} from "@/lib/utils";
+import { redirect } from "next/navigation";
+import { Quote } from "lucide-react";
+
 import ThoughtDetails from "@/app/(main)/dashboard/thought-details";
-import {getThoughts} from "@/app/actions";
 import DeleteThoughtButton from "@/app/(main)/dashboard/delete-thought-button";
+import { auth } from "@/auth";
+import { getThoughts } from "@/app/actions";
+import { formatDate } from "@/lib/utils";
+import {
+  Card,
+  CardFooter,
+  CardHeader
+} from "@/components/ui/card";
+
 
 export default async function Home() {
   const session = await auth()

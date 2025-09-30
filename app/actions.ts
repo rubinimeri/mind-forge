@@ -1,16 +1,28 @@
 "use server"
 
-import {GoogleGenAI} from '@google/genai';
-
 import z from "zod"
-import {signUpSchema} from "@/lib/schemas/auth.schema";
-import {prisma} from "@/lib/prisma";
-import {generateSalt, hashAndSaltPassword} from "@/utils/password";
-import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI, AreaChartData, ThoughtWithAIResponse} from "@/lib/defintions";
-import {auth} from "@/auth";
-import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
-import {revalidatePath} from "next/cache";
+import { revalidatePath } from "next/cache";
+import { GoogleGenAI } from '@google/genai';
+
+import { signUpSchema } from "@/lib/schemas/auth.schema";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { cleanAndParse } from "@/lib/utils";
+import {
+  generateSalt,
+  hashAndSaltPassword
+} from "@/utils/password";
+import {
+  Task,
+  Thought,
+  AIResponse
+} from "@/prisma/app/generated/prisma";
+import {
+  AIResponseFromAPI,
+  AreaChartData,
+  BarChartData,
+  ThoughtWithAIResponse
+} from "@/lib/defintions";
 
 type ThoughtState = {
   thought: Thought,
@@ -332,7 +344,7 @@ export async function changeTaskColumn(columnId: string, taskId: string) {
   }
 }
 
-export async function thoughtsCreatedPerDay(): Promise<AreaChartData | undefined> {
+export async function thoughtsCreatedPerDay(userId: string): Promise<AreaChartData | undefined> {
   try {
     // Get a list of unique dates
     // for each date see how many thoughts were created on that date
@@ -341,9 +353,37 @@ export async function thoughtsCreatedPerDay(): Promise<AreaChartData | undefined
     return await prisma.$queryRaw`
       SELECT DATE("createdAt") as date, COUNT(*)::int as count
       FROM "Thought"
+      WHERE "userId" = ${userId}
       GROUP BY DATE("createdAt")
       ORDER BY date;
     `;
+  } catch (err) {
+    console.log(err)
+  }
+}
+
+export async function topFiveThemes(userId: string): Promise<BarChartData | undefined> {
+  try {
+    const thoughts = await prisma.thought.findMany({
+      where: { userId },
+      select: {
+        AIResponse: {
+          select: {
+            themes: true
+          }
+        }
+      }
+    })
+
+    const themes =
+      thoughts
+        .flatMap(t => t.AIResponse?.themes)
+        .reduce((acc, theme) => {
+          acc[theme.toLowerCase()] = (acc[theme.toLowerCase()] || 0) + 1;
+          return acc;
+        }, {});
+
+    console.log(themes)
   } catch (err) {
     console.log(err)
   }

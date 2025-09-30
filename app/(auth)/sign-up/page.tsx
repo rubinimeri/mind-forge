@@ -1,10 +1,16 @@
-import React from 'react';
+import { redirect } from "next/navigation";
+
 import SignUpForm from "@/app/(auth)/sign-up/sign-up-form";
-import {Card, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import GithubSignIn from "@/components/github-sign-in";
 import GoogleSignIn from "@/components/google-sign-in";
-import {auth} from "@/auth";
-import {redirect} from "next/navigation";
+import { auth } from "@/auth";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 
 async function Page() {
   const session = await auth();
