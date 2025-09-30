@@ -7,6 +7,7 @@ import {
   Kanban
 } from "lucide-react";
 
+import Logo from "@/components/logo";
 import {
   Sidebar,
   SidebarContent, SidebarFooter,
@@ -66,9 +67,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   return (
     <Sidebar collapsible={"icon"} {...props}>
       <SidebarHeader>
-        <a href={"/"} className={"overflow-hidden"}>
-          <img src="/horizontal-logo.png" alt="" className={"min-w-[90px] w-[120px] "}/>
-        </a>
+        <Logo />
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (
