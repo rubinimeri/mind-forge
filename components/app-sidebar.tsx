@@ -7,6 +7,7 @@ import {
   Kanban
 } from "lucide-react";
 
+import Logo from "@/components/logo";
 import {
   Sidebar,
   SidebarContent, SidebarFooter,
@@ -56,7 +57,7 @@ const data = {
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const session = await auth()
-  if (!session?.user) return null
+  if (!session) return null
 
   const { user } = session
 
@@ -65,12 +66,10 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
 
   return (
     <Sidebar collapsible={"icon"} {...props}>
-      <SidebarHeader >
-        <SidebarMenuItem >
-          <SidebarMenuButton className={"min-h-max"} asChild isActive={pathname === "/"} >
-            <a href={"/"}><img src="/small-logo.png" alt="" width={50} className={"min-w-[30px]"}/> MindForge</a>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
+      <SidebarHeader>
+        <a href={"/"} className={"overflow-hidden"}>
+          <img src="/horizontal-logo.png" alt="" className={"min-w-[90px] w-[120px] "}/>
+        </a>
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (
@@ -79,8 +78,13 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.url === pathname} >
-                      <a href={item.url}>{item.icon}{item.title}</a>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={item.url === pathname}
+                    >
+                      <a href={item.url}>
+                        {item.icon}{item.title}
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -90,9 +94,15 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{ name: `${user.name} ${user.lastName || ''}`, email: user.email, avatar: "https://ui.shadcn.com/avatars/shadcn.jpg" }} />
+        <NavUser
+          user={{
+            name: `${user.name} ${user.lastName || ''}`,
+            email: user.email,
+            avatar: "https://ui.shadcn.com/avatars/shadcn.jpg"
+          }}
+        />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail/>
     </Sidebar>
   )
 }
