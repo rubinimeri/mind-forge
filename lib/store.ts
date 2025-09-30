@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import {KanbanTask} from "@/lib/defintions";
+
+import { KanbanTask } from "@/lib/defintions";
 
 type TasksStore = {
   tasks: KanbanTask[];

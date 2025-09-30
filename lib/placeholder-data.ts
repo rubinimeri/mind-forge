@@ -1,5 +1,6 @@
-import {faker} from "@faker-js/faker";
-import {capitalize} from "@/lib/utils";
+import { faker } from "@faker-js/faker";
+
+import { capitalize } from "@/lib/utils";
 
 export const placeholderThoughtData = [
   {

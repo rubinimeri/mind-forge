@@ -1,4 +1,5 @@
-import {Prisma} from "@/prisma/app/generated/prisma";
+import { Prisma } from "@/prisma/app/generated/prisma";
+
 export type AIResponseFromAPI = {
   thought: string;
   summary: string;
