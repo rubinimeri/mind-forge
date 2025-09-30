@@ -1,8 +1,15 @@
 "use client"
 
 import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis
+} from "recharts"
 
+import { cn } from "@/lib/utils";
+import { AreaChartData } from "@/lib/defintions";
 import {
   Card,
   CardContent,
@@ -18,9 +25,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import {chartData} from "@/lib/placeholder-data";
-import {cn} from "@/lib/utils";
-import {AreaChartData} from "@/lib/defintions";
 
 const chartConfig = {
   count: {

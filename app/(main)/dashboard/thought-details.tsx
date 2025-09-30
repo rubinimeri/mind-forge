@@ -1,12 +1,23 @@
 "use client"
 
-import {Check, ChevronDown, ChevronUp, Dot, FileText, Lightbulb, List, Tags, Target} from "lucide-react";
-import {Badge} from "@/components/ui/badge";
+import { useState } from "react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Dot,
+  FileText,
+  Lightbulb,
+  List,
+  Tags,
+  Target
+} from "lucide-react";
+
 import SaveToKanbanButton from "@/components/save-to-kanban-button";
-import {CardContent} from "@/components/ui/card";
-import {useState} from "react";
-import {Button} from "@/components/ui/button";
-import {ThoughtWithAIResponse} from "@/lib/defintions";
+import { Badge } from "@/components/ui/badge";
+import { CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ThoughtWithAIResponse } from "@/lib/defintions";
 
 function ThoughtDetails({ thought }: { thought: ThoughtWithAIResponse }) {
 

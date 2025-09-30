@@ -1,7 +1,15 @@
 "use client"
 
-import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from "recharts"
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  XAxis
+} from "recharts"
 
+import { cn } from "@/lib/utils";
+import { BarChartData } from "@/lib/defintions";
 import {
   Card,
   CardContent,
@@ -15,8 +23,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import {barChartData} from "@/lib/placeholder-data";
-import {cn} from "@/lib/utils";
 
 const chartConfig = {
   theme: {
@@ -25,7 +31,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export default function ThemesBarChart({ className }: { className?: string }) {
+export default function ThemesBarChart({ className, barChartData }: { className?: string, barChartData: BarChartData | undefined }) {
   return (
     <Card className={cn("", className)}>
       <CardHeader>
@@ -33,7 +39,7 @@ export default function ThemesBarChart({ className }: { className?: string }) {
         <CardDescription>Showing the top 5 themes related to your thoughts!</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer
+        {barChartData && <ChartContainer
           className="aspect-auto h-[250px] w-full"
           config={chartConfig}>
           <BarChart
@@ -43,7 +49,7 @@ export default function ThemesBarChart({ className }: { className?: string }) {
               top: 20,
             }}
           >
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false}/>
             <XAxis
               dataKey="theme"
               tickLine={false}
@@ -52,7 +58,7 @@ export default function ThemesBarChart({ className }: { className?: string }) {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<ChartTooltipContent hideLabel/>}
             />
             <Bar dataKey="count" fill="var(--color-theme)" radius={8}>
               <LabelList
@@ -63,7 +69,7 @@ export default function ThemesBarChart({ className }: { className?: string }) {
               />
             </Bar>
           </BarChart>
-        </ChartContainer>
+        </ChartContainer>}
       </CardContent>
     </Card>
   )

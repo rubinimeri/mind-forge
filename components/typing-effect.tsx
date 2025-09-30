@@ -1,5 +1,10 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+
+import {
+  useEffect,
+  useState
+} from 'react';
+
 const DELAY = 25;
 
 export default function TypingEffect({ text, onDoneAction }: {

@@ -1,18 +1,17 @@
 "use client"
 
-import {
-  useForm
-} from "react-hook-form"
-import {
-  zodResolver
-} from "@hookform/resolvers/zod"
-import {
-  z
-} from "zod"
+import Link from "next/link";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 
-import {
-  Button
-} from "@/components/ui/button"
+import { signUp } from "@/app/actions";
+import { signUpSchema } from "@/lib/schemas/auth.schema";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import {
   Form,
   FormControl,
@@ -23,17 +22,11 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import {
-  Input
-} from "@/components/ui/input"
-import {
-  PasswordInput
-} from "@/components/ui/password-input"
-import {CardContent, CardFooter} from "@/components/ui/card";
-import Link from "next/link";
-import { signUpSchema } from "@/lib/schemas/auth.schema";
-import {signUp} from "@/app/actions";
-import {signIn} from "next-auth/react";
-import {useState} from "react";
+  CardContent,
+  CardFooter
+} from "@/components/ui/card";
+
+
 
 export default function SignUpForm() {
   const [error, setError] = useState<string>("");

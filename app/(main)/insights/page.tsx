@@ -1,17 +1,29 @@
-import {auth} from "@/auth";
-import {redirect} from "next/navigation";
+import { redirect } from "next/navigation";
+
 import ThoughtsChartArea from "@/app/(main)/insights/thoughts-chart-area";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import ThemesBarChart from "@/app/(main)/insights/themes-bar-chart";
-import {Separator} from "@/components/ui/separator";
-import {thoughtsCreatedPerDay} from "@/app/actions";
+import { auth } from "@/auth";
+import { Separator } from "@/components/ui/separator";
+import {
+  thoughtsCreatedPerDay,
+  topFiveThemes
+} from "@/app/actions";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
+
 
 async function Page() {
   const session = await auth();
 
   if (!session.user) redirect('/sign-in')
 
-  const chartData = await thoughtsCreatedPerDay();
+  const chartData = await thoughtsCreatedPerDay(session.user.id);
+  const barChartData = await topFiveThemes(session.user.id);
+  console.log(barChartData)
 
   return (
     <div className={"bg-card"}>
@@ -21,7 +33,7 @@ async function Page() {
         </CardHeader>
         <CardContent className={"gap-4 flex flex-wrap"}>
           <ThoughtsChartArea chartData={chartData} className={"flex-grow-5 flex-[400px]"}/>
-          <ThemesBarChart className={"grow flex-[400px]"}/>
+          <ThemesBarChart barChartData={barChartData} className={"grow flex-[400px]"}/>
         </CardContent>
       </Card>
 

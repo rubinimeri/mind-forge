@@ -1,5 +1,5 @@
-import {Button} from "@/components/ui/button";
-import {signIn} from "@/auth";
+import { Button } from "@/components/ui/button";
+import { signIn } from "@/auth";
 
 function GithubSignIn() {
   return (

@@ -1,11 +1,19 @@
 "use client"
 
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {Button} from "@/components/ui/button";
-import {Pin} from "lucide-react";
-import {saveTaskToKanban} from "@/app/actions";
-import {useEffect, useState} from "react";
-import {Task} from "@/prisma/app/generated/prisma";
+import {
+  useEffect,
+  useState
+} from "react";
+import { Pin } from "lucide-react";
+
+import { saveTaskToKanban } from "@/app/actions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Task } from "@/prisma/app/generated/prisma";
 
 function SaveToKanbanButton({ taskId, task }: { taskId: string, task?: Task }) {
   const [pinned, setPinned] = useState(false)

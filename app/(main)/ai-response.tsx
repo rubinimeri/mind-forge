@@ -1,17 +1,39 @@
 "use client"
 
-import {Textarea} from "@/components/ui/textarea";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardFooter, CardHeader} from "@/components/ui/card";
-import {Bot, Dot, FileText, Lightbulb, List, Tags, Target} from "lucide-react";
-import {createThought} from '@/app/actions'
-import {useState, useActionState} from "react";
-import {Badge} from "@/components/ui/badge";
-import TypingEffect from "@/components/typing-effect";
-import {Skeleton} from "@/components/ui/skeleton";
+import {
+  useState,
+  useActionState
+} from "react";
+import {
+  Bot,
+  Dot,
+  FileText,
+  Lightbulb,
+  List,
+  Tags,
+  Target
+} from "lucide-react";
+
 import SaveToDashboardButton from "@/components/save-to-dashboard-button";
 import SaveToKanbanButton from "@/components/save-to-kanban-button";
-import {AIResponse, Task, Thought} from "@/prisma/app/generated/prisma";
+import TypingEffect from "@/components/typing-effect";
+import { createThought } from '@/app/actions'
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader
+} from "@/components/ui/card";
+
+import {
+  AIResponse,
+  Task,
+  Thought
+} from "@/prisma/app/generated/prisma";
 
 type ThoughtState = {
   thought: Thought,

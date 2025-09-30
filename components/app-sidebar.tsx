@@ -1,4 +1,12 @@
 import * as React from "react"
+import { headers } from "next/headers";
+import {
+  Home,
+  LayoutDashboard,
+  ChartArea,
+  Kanban
+} from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent, SidebarFooter,
@@ -10,10 +18,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import {Home, LayoutDashboard, ChartArea, Kanban} from "lucide-react";
-import {NavUser} from "@/components/nav-user";
-import {auth} from "@/auth";
-import {headers} from "next/headers";
+import { NavUser } from "@/components/nav-user";
+import { auth } from "@/auth";
+
 
 const data = {
   navMain: [
@@ -57,9 +64,13 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const pathname = headersList.get('x-pathname')
 
   return (
-    <Sidebar {...props}>
-      <SidebarHeader>
-        <img src="/horizontal-logo.png" alt="" width={140}/>
+    <Sidebar collapsible={"icon"} {...props}>
+      <SidebarHeader >
+        <SidebarMenuItem >
+          <SidebarMenuButton className={"min-h-max"} asChild isActive={pathname === "/"} >
+            <a href={"/"}><img src="/small-logo.png" alt="" width={50} className={"min-w-[30px]"}/> MindForge</a>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (

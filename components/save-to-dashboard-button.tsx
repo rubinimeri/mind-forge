@@ -1,8 +1,17 @@
-import {Button} from "@/components/ui/button";
-import {Dispatch, SetStateAction, useState} from "react";
-import { saveThoughtToDashboard} from "@/app/actions";
-import {Check, Loader} from "lucide-react";
+import {
+  Dispatch,
+  SetStateAction,
+  useState
+} from "react";
+import {
+  Check,
+  Loader
+} from "lucide-react";
+
 import TypingEffect from "@/components/typing-effect";
+import { Button } from "@/components/ui/button";
+import { saveThoughtToDashboard } from "@/app/actions";
+
 
 type SaveToDashboardButtonProps = {
   onDoneAction: Dispatch<SetStateAction<number>>,
