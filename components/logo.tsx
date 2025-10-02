@@ -1,14 +1,30 @@
 "use client"
 
-import { useTheme } from "next-themes";
 import * as React from "react";
+import Image from "next/image";
+import { useTheme } from "next-themes";
 
-export default function Logo() {
+import { cn } from "@/lib/utils";
+
+export default function Logo({
+  className,
+  ...props
+}: Omit<React.ComponentProps<typeof Image>, "src" | "alt"> & {
+  className?: string;
+}) {
   const { theme } = useTheme();
 
   return (
-    <a href={"/"} className={"overflow-hidden"}>
-      <img src={`${theme === "light" ? "/horizontal-logo.png" : "/white-horizontal-logo.png"}`} alt="" className={"min-w-[90px] w-[120px] "}/>
+    <a
+      href={"/"}
+      className={"overflow-hidden"}
+    >
+      <Image
+        className={cn("min-w-[90px]", className)}
+        {...props}
+        src={`${theme === "light" ? "/horizontal-logo.png" : "/white-horizontal-logo.png"}`}
+        alt="logo"
+      />
     </a>
   )
 }

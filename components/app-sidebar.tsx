@@ -67,7 +67,7 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   return (
     <Sidebar collapsible={"icon"} {...props}>
       <SidebarHeader>
-        <Logo />
+        <Logo width={120} height={30} />
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (

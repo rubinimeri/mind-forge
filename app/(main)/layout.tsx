@@ -35,8 +35,10 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
           />
           <span className={"tracking-wider text-sm"}>{path === "/" ? "Home" : formattedPath}</span>
           <ToggleThemeButton />
+
+        </header>
           {path === '/dashboard' && (
-            <>
+            <div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
               <form className={"ml-auto"} >
                 <Input
                   className={"placeholder:text-gray-600"}
@@ -56,9 +58,8 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
                   </SelectContent>
                 </Select>
               </form>
-            </>
+            </div>
           )}
-        </header>
         {children}
       </SidebarInset>
     </SidebarProvider>

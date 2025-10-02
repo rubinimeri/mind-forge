@@ -18,7 +18,7 @@ async function Page() {
   if (session?.user) redirect("/");
 
   return (
-    <Card className={"max-w-md mx-auto shadow-lg"}>
+    <Card className={"max-w-md mx-auto shadow-lg mt-[72px]"}>
       <CardHeader className={'text-center'}>
         <CardTitle>
           <h1 className="text-3xl">Sign In</h1>

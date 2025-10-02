@@ -19,7 +19,7 @@ async function Page() {
 
   return (
     <>
-      <Card className={"max-w-md mx-auto shadow-lg"}>
+      <Card className={"max-w-md mx-auto shadow-lg mt-15"}>
         <CardHeader className={'text-center'}>
         <CardTitle>
           <h1 className="text-3xl">Sign Up</h1>

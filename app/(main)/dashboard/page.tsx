@@ -26,7 +26,7 @@ export default async function Home() {
     )
 
   return (
-    <div className={"flex flex-wrap gap-4 p-4 items-start"}>
+    <div className={"columns-3 grid-rows-[masonry] gap-4 p-4 items-start"}>
       {thoughts.map((thought) => (
         <Card className={"grid grid-cols-1 basis-[600px] max-w-[600px] grow-1"} key={thought.id}>
           <CardHeader key={thought.id} className={"self-center flex justify-between items-start gap-1"}>

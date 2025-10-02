@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import { Button } from "@/components/ui/button";
 import { signIn } from "@/auth";
 
@@ -8,7 +10,7 @@ function GithubSignIn() {
       await signIn("google")
     }}>
       <Button variant={"outline"} className={"cursor-pointer w-full"}>
-        <span><img src="/google-logo.png" alt="" width={24}/></span>
+        <span><Image src="/google-logo.png" alt="" width={24} height={24}/></span>
         Continue with Google
       </Button>
     </form>
