@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useActionState } from "react";
 import {
   Bot,
   Dot,
@@ -10,34 +9,29 @@ import {
   Tags,
   Target,
 } from "lucide-react";
+import { useActionState, useState } from "react";
 
+import { createThought } from "@/app/actions";
 import SaveToDashboardButton from "@/components/save-to-dashboard-button";
 import SaveToKanbanButton from "@/components/save-to-kanban-button";
 import TypingEffect from "@/components/typing-effect";
-import { createThought } from "@/app/actions";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 
-import { AIResponse, Task, Thought } from "@/prisma/app/generated/prisma";
-
-type ThoughtState = {
-  thought: Thought;
-  AIResponse: AIResponse;
-  tasks: Task[];
-};
+import { CreateThoughtState } from "@/lib/defintions";
 
 export default function AIResponseCard() {
   const [currentRenderIndex, setCurrentRenderIndex] = useState(0);
   const [state, formAction, statePending] = useActionState<
-    Promise<ThoughtState | null>,
+    Promise<CreateThoughtState>,
     FormData
   >(createThought, null);
 
@@ -61,6 +55,11 @@ export default function AIResponseCard() {
               placeholder={"Type your thought here."}
               className={"placeholder:text-gray-400 border-2 border-inherit"}
             ></Textarea>
+            {state !== null && "error" in state && (
+              <p className="text-[13px] text-destructive mt-2 ml-3">
+                {state.error}
+              </p>
+            )}
             <Button
               type="submit"
               className={"mt-4 w-full"}
@@ -72,7 +71,20 @@ export default function AIResponseCard() {
           </form>
         </CardContent>
       </Card>
-      {!statePending && state && (
+      {statePending && (
+        <Card
+          className={
+            "mx-auto max-w-lg mt-8 h-[50svh] py-0 animate-[slideUp_0.5s_ease-out_forwards]"
+          }
+        >
+          <Skeleton
+            className={
+              "h-full bg-gradient-to-r from-muted via-muted-foreground/20 to-muted bg-[length:200%_100%] animate-[shimmer_3s_infinite]"
+            }
+          />
+        </Card>
+      )}
+      {state !== null && "thought" in state && (
         <Card
           className={
             "mx-auto max-w-lg mt-8 animate-[slideUp_0.5s_ease-out_forwards] mb-8"
@@ -212,19 +224,6 @@ export default function AIResponseCard() {
               </ul>
             )}
           </CardFooter>
-        </Card>
-      )}
-      {statePending && (
-        <Card
-          className={
-            "mx-auto max-w-lg mt-8 h-[50svh] py-0 animate-[slideUp_0.5s_ease-out_forwards]"
-          }
-        >
-          <Skeleton
-            className={
-              "h-full bg-gradient-to-r from-muted via-muted-foreground/20 to-muted bg-[length:200%_100%] animate-[shimmer_3s_infinite]"
-            }
-          />
         </Card>
       )}
     </>

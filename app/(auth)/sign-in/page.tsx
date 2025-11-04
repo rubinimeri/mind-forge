@@ -9,31 +9,32 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 
 async function Page() {
-  const session = await auth()
+  const session = await auth();
 
   if (session?.user) redirect("/");
 
   return (
     <Card className={"max-w-md mx-auto shadow-lg mt-[72px]"}>
-      <CardHeader className={'text-center'}>
+      <CardHeader className={"text-center"}>
         <CardTitle>
           <h1 className="text-3xl">Sign In</h1>
         </CardTitle>
         <CardDescription>
-          Welcome to MindForge, let's sign you in! <br/>
+          Welcome to MindForge, let&apos;s sign you in! <br />
         </CardDescription>
       </CardHeader>
-      <SignInForm/>
+      <SignInForm />
       <CardFooter className={"grid gap-2"}>
-        <GithubSignIn/>
-        <GoogleSignIn/>
+        <GithubSignIn />
+        <GoogleSignIn />
       </CardFooter>
     </Card>
   );
 }
 
 export default Page;
+

@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import {
-  useEffect,
-  useState
-} from 'react';
+import { useEffect, useState } from "react";
 
 const DELAY = 25;
 
-export default function TypingEffect({ text, onDoneAction }: {
+export default function TypingEffect({
+  text,
+  onDoneAction,
+}: {
   text: string;
   onDoneAction?: () => void;
 }) {
   const [currentLetterIndex, setCurrentLetterIndex] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
-  const [displayedText, setDisplayedText] = useState('');
+  const [displayedText, setDisplayedText] = useState("");
 
   useEffect(() => {
     if (currentLetterIndex >= text.length) {
       setIsRunning(false);
     }
-  }, [displayedText]);
+  }, [displayedText, currentLetterIndex, text.length]);
 
   useEffect(() => {
     if (!isRunning && onDoneAction) return onDoneAction();
@@ -28,14 +28,10 @@ export default function TypingEffect({ text, onDoneAction }: {
     const interval = setInterval(() => {
       setCurrentLetterIndex((prev) => prev + 1);
       setDisplayedText((prev) => prev + text.charAt(currentLetterIndex));
-    }, DELAY)
+    }, DELAY);
 
     return () => clearInterval(interval);
-  }, [isRunning, currentLetterIndex]);
+  }, [isRunning, currentLetterIndex, onDoneAction, text]);
 
-  return (
-    <>
-      {displayedText}
-    </>
-  );
+  return <>{displayedText}</>;
 }

@@ -1,13 +1,13 @@
-import {auth} from "@/auth";
-import {redirect} from "next/navigation";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import Link from "next/link";
-import {ArrowLeft, Plus} from "lucide-react";
-import {Button} from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Kanban from "@/app/(main)/kanban/kanban";
 import NewTaskForm from "@/app/(main)/kanban/new-task-form";
 
 async function Page() {
-  const session = await auth()
+  const session = await auth();
 
   if (!session?.user) redirect("/sign-in");
 
@@ -16,7 +16,7 @@ async function Page() {
       <div className={"flex justify-between mb-3"}>
         <Button variant={"link"} className={"pl-0 pt-0"}>
           <Link href={"/dashboard"} className={"flex items-center gap-1"}>
-            <ArrowLeft/>
+            <ArrowLeft />
             Back to Dashboard
           </Link>
         </Button>
@@ -28,3 +28,4 @@ async function Page() {
 }
 
 export default Page;
+

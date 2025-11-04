@@ -9,29 +9,29 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from "@/components/ui/card";
 
 async function Page() {
   const session = await auth();
 
-  if (session?.user) redirect('/')
+  if (session?.user) redirect("/");
 
   return (
     <>
       <Card className={"max-w-md mx-auto shadow-lg mt-15"}>
-        <CardHeader className={'text-center'}>
-        <CardTitle>
-          <h1 className="text-3xl">Sign Up</h1>
-        </CardTitle>
-        <CardDescription>
-          Welcome to MindForge, let's create a new account! <br/>
-        </CardDescription>
-      </CardHeader>
-        <SignUpForm/>
+        <CardHeader className={"text-center"}>
+          <CardTitle>
+            <h1 className="text-3xl">Sign Up</h1>
+          </CardTitle>
+          <CardDescription>
+            Welcome to MindForge, let&apos;s create a new account! <br />
+          </CardDescription>
+        </CardHeader>
+        <SignUpForm />
         <CardFooter className={"grid gap-2"}>
-          <GithubSignIn/>
-          <GoogleSignIn/>
+          <GithubSignIn />
+          <GoogleSignIn />
         </CardFooter>
       </Card>
     </>
@@ -39,3 +39,4 @@ async function Page() {
 }
 
 export default Page;
+

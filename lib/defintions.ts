@@ -1,4 +1,9 @@
-import { Prisma } from "@/prisma/app/generated/prisma";
+import {
+  AIResponse,
+  Prisma,
+  Task,
+  Thought,
+} from "@/prisma/app/generated/prisma";
 
 export type AIResponseFromAPI = {
   thought: string;
@@ -7,7 +12,7 @@ export type AIResponseFromAPI = {
   suggestedGoal: string;
   themes: string[];
   tasks: string[];
-}
+};
 
 export type ThoughtWithAIResponse = Prisma.ThoughtGetPayload<{
   include: {
@@ -20,10 +25,10 @@ export type ThoughtWithAIResponse = Prisma.ThoughtGetPayload<{
 }>;
 
 export type KanbanColumn = {
-  id: string
-  name: string
-  color: string
-}
+  id: string;
+  name: string;
+  color: string;
+};
 
 export type KanbanTask = {
   id: string;
@@ -40,4 +45,13 @@ export type AreaChartData = {
 export type BarChartData = {
   theme: string;
   count: number;
-}[]
+}[];
+
+export type CreateThoughtState =
+  | {
+      thought: Thought;
+      AIResponse: AIResponse;
+      tasks: Task[];
+    }
+  | { error: string }
+  | null;
