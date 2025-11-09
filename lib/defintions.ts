@@ -44,7 +44,10 @@ export type AreaChartData = {
   count: number;
 }[];
 
-export type BarChartData = Record<string, number>;
+export type BarChartData = {
+  theme: string;
+  count: number;
+}[];
 
 export type CreateThoughtState =
   | {

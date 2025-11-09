@@ -18,6 +18,7 @@ import {
   ThoughtWithAIResponse,
 } from "@/lib/defintions";
 import { thoughtInputSchema } from "@/lib/schemas/thought-input-schema";
+import { log } from "console";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
@@ -422,15 +423,29 @@ export async function topFiveThemes(
       },
     });
 
-    const themes = thoughts
-      .flatMap((t) => t.AIResponse?.themes)
-      .reduce((acc: Record<string, number>, theme) => {
-        if (theme) {
-          acc[theme.toLowerCase()] = (acc[theme.toLowerCase()] || 0) + 1;
-        }
-        return acc;
-      }, {});
-    return themes;
+    const arrayThemes = thoughts.flatMap((t) => t.AIResponse?.themes);
+
+    const themes: BarChartData = [];
+
+    arrayThemes.forEach((theme) => {
+      const isThemeInThemesArray = themes.find(
+        (t) => t.theme.toLowerCase() === theme?.toLowerCase(),
+      );
+
+      if (isThemeInThemesArray) {
+        const themeIndex = themes.findIndex(
+          (t) => t.theme.toLowerCase() === theme?.toLowerCase(),
+        );
+        return themes[themeIndex].count++;
+      }
+
+      themes.push({
+        theme: theme?.toLowerCase() as string,
+        count: 1,
+      });
+    });
+
+    return themes.sort((a, b) => b.count - a.count).slice(0, 5);
   } catch (err) {
     console.error("Error getting top 5 themes: ", err);
     return { error: "Something went wrong!" };
