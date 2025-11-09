@@ -22,40 +22,41 @@ export default async function Home() {
 
   return (
     <div className={"grid gap-4 p-4 items-start"}>
-      {thoughts.map((thought) => (
-        <Card className={"flex-row items-start"} key={thought.id}>
-          <CardHeader
-            key={thought.id}
-            className={"flex justify-between items-start gap-1 w-full"}
-          >
-            <Quote
-              strokeWidth={1}
-              className={
-                "transform rotate-180 fill-primary stroke-primary text-[40px] shrink-0"
-              }
-            />
-            <h3 className={"italic text-xl tracking-wide text-center"}>
-              {thought.content}
-            </h3>
-            <Quote
-              strokeWidth={1}
-              className={
-                "self-end fill-primary stroke-primary text-[40px] shrink-0"
-              }
-            />
-          </CardHeader>
+      {!("error" in thoughts) &&
+        thoughts.map((thought) => (
+          <Card className={"flex-row items-start"} key={thought.id}>
+            <CardHeader
+              key={thought.id}
+              className={"flex justify-between items-start gap-1 w-full"}
+            >
+              <Quote
+                strokeWidth={1}
+                className={
+                  "transform rotate-180 fill-primary stroke-primary text-[40px] shrink-0"
+                }
+              />
+              <h3 className={"italic text-xl tracking-wide text-center"}>
+                {thought.content}
+              </h3>
+              <Quote
+                strokeWidth={1}
+                className={
+                  "self-end fill-primary stroke-primary text-[40px] shrink-0"
+                }
+              />
+            </CardHeader>
 
-          <ThoughtDetails thought={thought} />
+            <ThoughtDetails thought={thought} />
 
-          <CardFooter className={"flex justify-between"}>
-            <DeleteThoughtButton thoughtId={thought.id} />
+            <CardFooter className={"flex justify-between"}>
+              <DeleteThoughtButton thoughtId={thought.id} />
 
-            <p className={"tracking-wider text-sm font-light text-gray-500"}>
-              {formatDate(thought.createdAt)}
-            </p>
-          </CardFooter>
-        </Card>
-      ))}
+              <p className={"tracking-wider text-sm font-light text-gray-500"}>
+                {formatDate(thought.createdAt)}
+              </p>
+            </CardFooter>
+          </Card>
+        ))}
     </div>
   );
 }
