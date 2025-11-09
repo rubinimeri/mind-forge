@@ -14,6 +14,7 @@ import EditTaskForm from "@/app/(main)/kanban/edit-task-form";
 import { Button } from "@/components/ui/button";
 import { Loader, Trash } from "lucide-react";
 import { useTasksStore } from "@/lib/store";
+import { toast } from "sonner";
 
 const Kanban = ({ userId }: { userId: string }) => {
   const { tasks, setTasks } = useTasksStore();
@@ -58,7 +59,11 @@ const Kanban = ({ userId }: { userId: string }) => {
   const handleDelete = async (taskId: string) => {
     setLoading(true);
     try {
-      await deleteTask(taskId);
+      const response = await deleteTask(taskId);
+      if (response && "error" in response) {
+        setLoading(false);
+        return toast(response.error);
+      }
       setTasks(tasks.filter((task) => task.id !== taskId));
     } catch (err) {
       console.error(err);
