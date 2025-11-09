@@ -4,17 +4,22 @@ import ThoughtsChartArea from "@/app/(main)/insights/thoughts-chart-area";
 import ThemesBarChart from "@/app/(main)/insights/themes-bar-chart";
 import { auth } from "@/auth";
 import { Separator } from "@/components/ui/separator";
-import { thoughtsCreatedPerDay, topFiveThemes } from "@/app/actions";
+import {
+  getTaskStats,
+  thoughtsCreatedPerDay,
+  topFiveThemes,
+} from "@/app/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 async function Page() {
   const session = await auth();
 
   if (!session.user) redirect("/sign-in");
+  const userId = session.user.id;
 
-  const chartData = await thoughtsCreatedPerDay(session.user.id);
-  const barChartData = await topFiveThemes(session.user.id);
-  console.log(barChartData);
+  const chartData = await thoughtsCreatedPerDay(userId);
+  const barChartData = await topFiveThemes(userId);
+  const taskStats = await getTaskStats(userId);
 
   return (
     <div className={"bg-card"}>
@@ -58,26 +63,34 @@ async function Page() {
             <h2 className={"text-3xl"}>Goal Progress</h2>
           </CardTitle>
         </CardHeader>
-        <CardContent className={"gap-4 flex flex-wrap"}>
-          <Card>
-            <CardTitle className={"font-normal text-center"}>
-              Tasks Created
-            </CardTitle>
-            <Separator orientation={"horizontal"} />
-            <CardContent>
-              <h4 className={"text-9xl text-[#F08C00] font-black"}>28</h4>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardTitle className={"text-center"}>
-              <h4 className={"font-normal text-center"}>Tasks Completed</h4>
-            </CardTitle>
-            <Separator orientation={"horizontal"} />
-            <CardContent>
-              <h4 className={"text-9xl text-green-600 font-black"}>18</h4>
-            </CardContent>
-          </Card>
-        </CardContent>
+        {!("error" in taskStats) ? (
+          <CardContent className={"gap-4 flex flex-wrap"}>
+            <Card>
+              <CardTitle className={"font-normal text-center"}>
+                Tasks Created
+              </CardTitle>
+              <Separator orientation={"horizontal"} />
+              <CardContent>
+                <h4 className={"text-9xl text-[#F08C00] font-black"}>
+                  {taskStats.createdTasks}
+                </h4>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardTitle className={"text-center"}>
+                <h4 className={"font-normal text-center"}>Tasks Completed</h4>
+              </CardTitle>
+              <Separator orientation={"horizontal"} />
+              <CardContent>
+                <h4 className={"text-9xl text-green-600 font-black"}>
+                  {taskStats.completedTasks}
+                </h4>
+              </CardContent>
+            </Card>
+          </CardContent>
+        ) : (
+          <p className="text-destructive">{taskStats.error}</p>
+        )}
       </Card>
       <Card
         className={
@@ -104,4 +117,3 @@ async function Page() {
 }
 
 export default Page;
-

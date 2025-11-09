@@ -19,6 +19,7 @@ import {
 } from "@/lib/defintions";
 import { thoughtInputSchema } from "@/lib/schemas/thought-input-schema";
 import { log } from "console";
+import { columns } from "@/lib/placeholder-data";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
@@ -449,5 +450,39 @@ export async function topFiveThemes(
   } catch (err) {
     console.error("Error getting top 5 themes: ", err);
     return { error: "Something went wrong!" };
+  }
+}
+
+export async function getTaskStats(
+  userId: string,
+): Promise<
+  { createdTasks: number; completedTasks: number } | { error: string }
+> {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      select: {
+        columns: {
+          include: {
+            tasks: true,
+          },
+        },
+      },
+    });
+
+    if (!board) {
+      return { error: "Board not found!" };
+    }
+    const createdTasks = board.columns.flatMap((c) => c.tasks).length;
+    const completedTasks = board.columns.find((c) => c.title === "Done")?.tasks
+      .length;
+
+    return {
+      createdTasks,
+      completedTasks: completedTasks ? completedTasks : 0,
+    };
+  } catch (err) {
+    console.error("Failed to get task stats: ", err);
+    return { error: "Failed to get task stats!" };
   }
 }
