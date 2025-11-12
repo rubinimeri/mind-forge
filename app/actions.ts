@@ -509,12 +509,15 @@ export async function getActivity(
     tenDaysAgo.setDate(now.getDate() - 10);
 
     const result: ThoughtActivity = await prisma.$queryRaw`
-      SELECT DATE("createdAt") as date, COUNT(*) as count
-      FROM "Thought"
-      WHERE "userId" = ${userId}
-        AND "createdAt" BETWEEN ${tenDaysAgo} AND ${now}
-      GROUP BY DATE("createdAt")
-      ORDER BY DATE("createdAt") ASC;
+      SELECT
+        dates.date,
+        COUNT("Thought"."id") AS count
+      FROM generate_series(${tenDaysAgo}::date, ${now}::date, '1 day') AS dates(date)
+      LEFT JOIN "Thought"
+        ON DATE("Thought"."createdAt") = dates.date
+        AND "Thought"."userId" = ${userId}
+      GROUP BY dates.date
+      ORDER BY dates.date ASC;
     `;
 
     return result.map((activity) => ({
