@@ -18,8 +18,7 @@ import {
   ThoughtWithAIResponse,
 } from "@/lib/defintions";
 import { thoughtInputSchema } from "@/lib/schemas/thought-input-schema";
-import { log } from "console";
-import { columns } from "@/lib/placeholder-data";
+import { ActivityIcon } from "lucide-react";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
@@ -396,13 +395,19 @@ export async function thoughtsCreatedPerDay(
     // for each date see how many thoughts were created on that date
     // return a date and a count
 
-    return await prisma.$queryRaw`
+    const response: AreaChartData = await prisma.$queryRaw`
       SELECT DATE("createdAt") as date, COUNT(*)::int as count
       FROM "Thought"
       WHERE "userId" = ${userId}
       GROUP BY DATE("createdAt")
       ORDER BY date;
     `;
+
+    if (!response.length) {
+      return { error: "No thoughts yet!" };
+    }
+
+    return response;
   } catch (err) {
     console.error("Failed to get thoughts created per day: ", err);
     return { error: "Failed to get thoughts created per day!" };
@@ -446,6 +451,10 @@ export async function topFiveThemes(
       });
     });
 
+    if (!arrayThemes.length) {
+      return { error: "No themes yet!" };
+    }
+
     return themes.sort((a, b) => b.count - a.count).slice(0, 5);
   } catch (err) {
     console.error("Error getting top 5 themes: ", err);
@@ -484,5 +493,36 @@ export async function getTaskStats(
   } catch (err) {
     console.error("Failed to get task stats: ", err);
     return { error: "Failed to get task stats!" };
+  }
+}
+
+// Activity heatmap action
+// - Return a date and thoughts created on that date activity = { date: Date, thoughtsCreated: number }
+// - Return 10 days worth of data - ( today - 10 )
+type ThoughtActivity = { date: Date; count: number }[];
+export async function getActivity(
+  userId: string,
+): Promise<ThoughtActivity | { error: string }> {
+  try {
+    const now = new Date();
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(now.getDate() - 10);
+
+    const result: ThoughtActivity = await prisma.$queryRaw`
+      SELECT DATE("createdAt") as date, COUNT(*) as count
+      FROM "Thought"
+      WHERE "userId" = ${userId}
+        AND "createdAt" BETWEEN ${tenDaysAgo} AND ${now}
+      GROUP BY DATE("createdAt")
+      ORDER BY DATE("createdAt") ASC;
+    `;
+
+    return result.map((activity) => ({
+      ...activity,
+      count: Number(activity.count),
+    }));
+  } catch (err) {
+    console.error("Failed to get activity: ", err);
+    return { error: "Failed to get activity!" };
   }
 }
