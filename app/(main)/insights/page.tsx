@@ -5,11 +5,18 @@ import ThemesBarChart from "@/app/(main)/insights/themes-bar-chart";
 import { auth } from "@/auth";
 import { Separator } from "@/components/ui/separator";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  getActivity,
   getTaskStats,
   thoughtsCreatedPerDay,
   topFiveThemes,
 } from "@/app/actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { dateFormatter, formatDate } from "@/lib/utils";
 
 async function Page() {
   const session = await auth();
@@ -17,9 +24,31 @@ async function Page() {
   if (!session.user) redirect("/sign-in");
   const userId = session.user.id;
 
-  const chartData = await thoughtsCreatedPerDay(userId);
-  const barChartData = await topFiveThemes(userId);
-  const taskStats = await getTaskStats(userId);
+  const [chartData, barChartData, taskStats, activity] = await Promise.all([
+    thoughtsCreatedPerDay(userId),
+    topFiveThemes(userId),
+    getTaskStats(userId),
+    getActivity(userId),
+  ]);
+
+  function colorWeights(count: number): string {
+    switch (count) {
+      case 0:
+        return "";
+      case 1:
+        return "bg-green-50";
+      case 2:
+        return "bg-green-100";
+      case 3:
+        return "bg-green-200";
+      case 4:
+        return "bg-green-300";
+      case 5:
+        return "bg-green-400";
+      default:
+        return "bg-green-500";
+    }
+  }
 
   return (
     <div className={"bg-card"}>
@@ -107,9 +136,26 @@ async function Page() {
             "grid grid-cols-20 gap-1 justify-center w-max border py-6 rounded-[inherit]"
           }
         >
-          {Array.from({ length: 100 }).map((value, index) => (
-            <div key={index} className={"bg-green-300 w-4 h-4 rounded"}></div>
-          ))}
+          {"error" in activity ? (
+            <p>{activity.error}</p>
+          ) : (
+            activity.map((value) => {
+              const colorWeight = colorWeights(value.count);
+              return (
+                <Tooltip>
+                  <TooltipTrigger key={value.count}>
+                    <div
+                      key={value.count}
+                      className={`${colorWeight} border w-4 h-4 rounded`}
+                    ></div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {formatDate(value.date)} - Thoughts Created: {value.count}
+                  </TooltipContent>
+                </Tooltip>
+              );
+            })
+          )}
         </CardContent>
       </Card>
     </div>
