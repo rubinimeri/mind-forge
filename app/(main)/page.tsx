@@ -1,7 +1,8 @@
-import {auth} from "@/auth";
 import {redirect} from "next/navigation";
 import React from "react";
+
 import AIResponse from "@/app/(main)/ai-response";
+import {auth} from "@/auth";
 
 export default async function Home() {
   const session = await auth()

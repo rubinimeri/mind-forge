@@ -1,19 +1,23 @@
-"use client"
+"use client";
 
-import {Tooltip, TooltipContent, TooltipTrigger} from "@/components/ui/tooltip";
-import {Button} from "@/components/ui/button";
-import {Pin} from "lucide-react";
-import {saveTaskToKanban} from "@/app/actions";
-import {useEffect, useState} from "react";
-import {Task} from "@/prisma/app/generated/prisma";
+import { useEffect, useState } from "react";
+import { Pin } from "lucide-react";
 
-function SaveToKanbanButton({ taskId, task }: { taskId: string, task?: Task }) {
-  const [pinned, setPinned] = useState(false)
+import { saveTaskToKanban } from "@/app/actions";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { Task } from "@/prisma/app/generated/prisma";
+
+function SaveToKanbanButton({ taskId, task }: { taskId: string; task?: Task }) {
+  const [pinned, setPinned] = useState(false);
 
   useEffect(() => {
-    if (task?.columnId)
-      setPinned(true)
-  }, [])
+    if (task?.columnId) setPinned(true);
+  }, [task?.columnId]);
 
   const handleClick = async () => {
     try {
@@ -21,9 +25,9 @@ function SaveToKanbanButton({ taskId, task }: { taskId: string, task?: Task }) {
       setPinned(true);
     } catch (error) {
       console.error(error);
-      setPinned(false)
+      setPinned(false);
     }
-  }
+  };
 
   return (
     <Tooltip>
@@ -34,18 +38,19 @@ function SaveToKanbanButton({ taskId, task }: { taskId: string, task?: Task }) {
           size={"sm"}
           disabled={pinned}
           className={""}
-          onClick={async () => await handleClick()}>
-          {!pinned ?
-            <Pin/> :
+          onClick={async () => await handleClick()}
+        >
+          {!pinned ? (
+            <Pin />
+          ) : (
             <Pin fill={"#8942F3"} className={"text-primary"} />
-          }
+          )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>
-        Save to Kanban
-      </TooltipContent>
+      <TooltipContent>Save to Kanban</TooltipContent>
     </Tooltip>
   );
 }
 
 export default SaveToKanbanButton;
+

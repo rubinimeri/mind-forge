@@ -1,28 +1,35 @@
-"use server"
+"use server";
 
-import {GoogleGenAI} from '@google/genai';
+import z from "zod";
+import { revalidatePath } from "next/cache";
+import { GoogleGenAI } from "@google/genai";
 
-import z from "zod"
-import {signUpSchema} from "@/lib/schemas/auth.schema";
-import {prisma} from "@/lib/prisma";
-import {generateSalt, hashAndSaltPassword} from "@/utils/password";
-import {cleanAndParse} from "@/lib/utils";
-import {AIResponseFromAPI, KanbanTask, ThoughtWithAIResponse} from "@/lib/defintions";
-import {auth} from "@/auth";
-import {Task, Thought, AIResponse} from "@/prisma/app/generated/prisma";
-import {revalidatePath} from "next/cache";
+import { signUpSchema } from "@/lib/schemas/auth.schema";
+import { prisma } from "@/lib/prisma";
+import { auth } from "@/auth";
+import { cleanAndParse } from "@/lib/utils";
+import { generateSalt, hashAndSaltPassword } from "@/utils/password";
+import { Task } from "@/prisma/app/generated/prisma";
+import {
+  AIResponseFromAPI,
+  AreaChartData,
+  BarChartData,
+  CreateThoughtState,
+  ThoughtWithAIResponse,
+} from "@/lib/defintions";
+import { thoughtInputSchema } from "@/lib/schemas/thought-input-schema";
+import { ActivityIcon } from "lucide-react";
 
-type ThoughtState = {
-  thought: Thought,
-  AIResponse: AIResponse,
-  tasks: Task[]
-}
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
 
 export async function signUp(data: z.infer<typeof signUpSchema>) {
   try {
-    const existingUser = await prisma.user.findFirst({where: {email: data.email}})
+    const existingUser = await prisma.user.findFirst({
+      where: { email: data.email },
+    });
 
-    if (existingUser) return { error: "Account already exists with this email!" }
+    if (existingUser)
+      return { error: "Account already exists with this email!" };
 
     const salt = generateSalt();
     const hashedPassword = await hashAndSaltPassword(data.password, salt);
@@ -33,20 +40,22 @@ export async function signUp(data: z.infer<typeof signUpSchema>) {
         lastName: data.lastName,
         email: data.email,
         password: hashedPassword,
-        salt
-      }
-    })
+        salt,
+      },
+    });
 
-    if (user == null) return { error: "Account creation failed!" }
+    if (user == null) return { error: "Account creation failed!" };
 
-    return { user }
+    return { user };
   } catch (error) {
-    console.log(error)
-    return { error: "Account creation failed!" }
+    console.log(error);
+    return { error: "Account creation failed!" };
   }
 }
 
-export async function fetchAIResponse(thought: FormDataEntryValue | null): Promise<AIResponseFromAPI> {
+export async function fetchAIResponse(
+  thought: string,
+): Promise<AIResponseFromAPI> {
   const AIRole = `
       You are a productivity assistant.
 
@@ -64,125 +73,150 @@ export async function fetchAIResponse(thought: FormDataEntryValue | null): Promi
       Do not include any commentary or explanation outside the JSON.
       Do not include markdown code block markers.
       Return only the JSON object. Keys must always be present — if a value is unclear, return an empty string or empty array.
-  `
+  `;
 
-  const ai = new GoogleGenAI({apiKey: process.env.GOOGLE_API_KEY});
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash-001",
+      contents: `${AIRole} User: ${thought}`,
+    });
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-2.0-flash-001',
-    contents: `${AIRole} User: ${thought}`,
-  });
-
-  return cleanAndParse(response.text || "")
+    return cleanAndParse(response.text || "");
+  } catch (err) {
+    console.error("Error fetching AI response: ", err);
+    return { error: "Error fetching AI response!" };
+  }
 }
 
-export async function createThought(state: ThoughtState | null, formData: FormData): Promise<ThoughtState | null> {
-  const thoughtInput = formData.get("thought");
+export async function createThought(
+  state: CreateThoughtState,
+  formData: FormData,
+): Promise<CreateThoughtState> {
+  try {
+    const parsed = thoughtInputSchema.safeParse({
+      thought: formData.get("thought"),
+    });
+    if (!parsed.success) return { error: parsed.error?.issues[0].message };
 
-  const session = await auth()
-  if (!session?.user) return null
+    const session = await auth();
+    if (!session?.user) return { error: "Unauthorized" };
 
-  const user = await prisma.user.findFirst({where: {id: session.user.id}})
-  if (!user) return null
+    const user = await prisma.user.findFirst({
+      where: { id: session.user.id },
+    });
+    if (!user) return { error: "User not found!" };
 
-  const response = await fetchAIResponse(thoughtInput);
+    const response = await fetchAIResponse(parsed.data.thought);
+    if ("error" in response) return { error: response.error };
 
-  // First create a thought
-  const thought = await prisma.thought.create({
-    data: {
-      content: response.thought,
-      userId: session.user.id
-    }
-  })
+    const result = await prisma.$transaction(async (tx) => {
+      // First create a thought
+      const thought = await tx.thought.create({
+        data: {
+          content: response.thought,
+          userId: session.user.id,
+        },
+      });
 
-  // Create AIResponse linked to the thought
-  const AIResponse = await prisma.aIResponse.create({
-    data: {
-      thoughtId: thought.id,
-      summary: response.summary,
-      insight: response.insight,
-      suggestedGoal: response.suggestedGoal,
-      themes: response.themes,
-    }
-  })
+      // Create AIResponse linked to the thought
+      const AIResponse = await tx.aIResponse.create({
+        data: {
+          thoughtId: thought.id,
+          summary: response.summary,
+          insight: response.insight,
+          suggestedGoal: response.suggestedGoal,
+          themes: response.themes,
+        },
+      });
 
-  // Create tasks linked to the AIResponse
-  const tasks: Task[] = await Promise.all(
-    response.tasks.map(task => prisma.task.create({
-      data: {
-        content: task,
-        AIResponseId: AIResponse.id
-      }
-    }))
-  );
+      // Create tasks linked to the AIResponse
+      const tasks: Task[] = await Promise.all(
+        response.tasks.map((task) =>
+          tx.task.create({
+            data: {
+              content: task,
+              AIResponseId: AIResponse.id,
+            },
+          }),
+        ),
+      );
 
-  return { thought, AIResponse, tasks };
+      return { thought, AIResponse, tasks };
+    });
+
+    return result;
+  } catch (err) {
+    console.error("Error creating thought: ", err);
+    return { error: "Internal server error." };
+  }
 }
 
 export async function saveThoughtToDashboard(thoughtId: string) {
-  const session = await auth()
-  if (!session?.user) return
+  try {
+    const session = await auth();
+    if (!session?.user) return { error: "Unauthorized!" };
 
-  const savedThought = await prisma.thought.update({
-    where: {
-      id: thoughtId
-    },
-    data: {
-      saved: true
-    }
-  })
-
-  console.log(savedThought);
+    await prisma.thought.update({
+      where: {
+        id: thoughtId,
+      },
+      data: {
+        saved: true,
+      },
+    });
+  } catch (err) {
+    console.error("Error saving thought to dashboard: ", err);
+    return { error: "Internal server error." };
+  }
 }
 
 export async function saveTaskToKanban(taskId: string) {
+  try {
+    const session = await auth();
+    if (!session?.user) return { error: "Unauthorized" };
 
-  const session = await auth()
-  if (!session?.user) return
+    const board = await prisma.board.findFirst({
+      where: { userId: session.user.id },
+      include: {
+        columns: {
+          where: {
+            position: 0,
+          },
+        },
+      },
+    });
 
-  const board = await prisma.board.findFirst({
-    where: { userId: session.user.id },
-    include: {
-      columns: {
-        where: {
-          position: 0
-        }
-      }
-    }
-  })
+    const toDoColumn = await prisma.column.findFirst({
+      where: { boardId: board?.id, position: 0 },
+    });
 
-  if (!board) return
-
-  const toDoColumn = await prisma.column.findFirst({
-    where: { boardId: board?.id, position: 0 }
-  })
-
-  const task = await prisma.task.update({
-    where: { id: taskId },
-    data: { columnId: toDoColumn?.id }
-  })
-
-  console.log(task);
-
-  return task
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { columnId: toDoColumn?.id },
+    });
+  } catch (err) {
+    console.error("Error saving task to kanban board: ", err);
+    return { error: "Internal server error." };
+  }
 }
 
-export async function getThoughts(userId: string): Promise<ThoughtWithAIResponse[] | null>{
-
+export async function getThoughts(
+  userId: string,
+): Promise<ThoughtWithAIResponse[] | { error: string }> {
   try {
     return await prisma.thought.findMany({
       where: { userId },
       include: {
         AIResponse: {
           include: {
-            tasks: true
-          }
-        }
-      }
-    })
+            tasks: true,
+          },
+        },
+      },
+    });
   } catch (error) {
-    console.log(error)
-    return null
+    console.log("Failed to get thoughts: ", error);
+    return { error: "Failed to get thoughts!" };
   }
 }
 
@@ -190,34 +224,35 @@ export async function deleteThought(thoughtId: string) {
   try {
     // Delete tasks related to the thought if they don't
     // have a column ID
-    const thought =
-      await prisma.thought.findFirst({
-        where: { id: thoughtId },
-        include: {
-          AIResponse: {
-            include: {
-              tasks: true
-            }
-          }
+    const thought = await prisma.thought.findFirst({
+      where: { id: thoughtId },
+      include: {
+        AIResponse: {
+          include: {
+            tasks: true,
+          },
+        },
+      },
+    });
+
+    await prisma.$transaction(async (tx) => {
+      if (thought?.AIResponse?.tasks) {
+        for (const task of thought.AIResponse.tasks) {
+          if (task.columnId) await tx.task.delete({ where: { id: task.id } });
+          else
+            await tx.task.update({
+              where: { id: task.id },
+              data: { AIResponseId: null },
+            });
         }
-    })
+      }
 
-    for (const task of thought?.AIResponse!?.tasks) {
-      if (task.columnId)
-        await prisma.task.delete({ where: { id: task.id } })
-      else
-        await prisma.task.update({
-          where: { id: task.id },
-          data: { AIResponseId: null }
-        })
-    }
-
-    await prisma.aIResponse.delete({ where: { thoughtId } })
-    await prisma.thought.delete({ where: { id: thoughtId } })
-
-    revalidatePath("/dashboard")
+      await tx.aIResponse.delete({ where: { thoughtId } });
+      await tx.thought.delete({ where: { id: thoughtId } });
+    });
+    revalidatePath("/dashboard");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 }
 
@@ -228,20 +263,27 @@ export async function getColumns(userId: string) {
       select: {
         columns: {
           orderBy: {
-            position: "asc"
-          }
+            position: "asc",
+          },
         },
       },
     });
 
-    return board?.columns.map((column) => ({
-      id: column.id,
-      name: column.title,
-      color: column.position === 0 ? "red" : column.position === 1 ? "yellow" : "green"
-    })) ?? []
+    return (
+      board?.columns.map((column) => ({
+        id: column.id,
+        name: column.title,
+        color:
+          column.position === 0
+            ? "red"
+            : column.position === 1
+              ? "yellow"
+              : "green",
+      })) ?? []
+    );
   } catch (err) {
-    console.log(err)
-    return []
+    console.error("Failed to get columns: ", err);
+    return [];
   }
 }
 
@@ -249,75 +291,87 @@ export async function getSavedTasks(userId: string) {
   try {
     const board = await prisma.board.findFirst({
       where: { userId },
-      include: { columns: true }
-    })
+      include: { columns: true },
+    });
     const tasks = await prisma.task.findMany({
       where: {
         columnId: {
-          in: board?.columns.map(c => c.id),
-        }
-      }
-    })
-    return tasks.map(task => ({
+          in: board?.columns.map((c) => c.id),
+        },
+      },
+    });
+    return tasks.map((task) => ({
       id: task.id,
       column: task.columnId as string,
       name: task.content,
       createdAt: task.createdAt,
-    }))
+    }));
   } catch (error) {
-    console.log(error)
-    return []
+    console.error("Failed to get saved tasks: ", error);
+    return [];
   }
 }
 
-export async function editTask(taskId: string, content: string, theme: [string] | null = null) {
+// TODO - make it work with theme/s
+// TODO - add zod validtion
+export async function editTask(
+  taskId: string,
+  content: string,
+  theme: [string] | null = null,
+) {
   try {
-    const updatedTask = await prisma.task.update({
+    await prisma.task.update({
       where: { id: taskId },
       data: {
         content,
-      }
-    })
-    console.log(updatedTask)
+      },
+    });
   } catch (err) {
-    console.log(err)
+    console.error("Failed to edit task: ", err);
+    return { error: "Failed to edit task!" };
   }
 }
 
 export async function deleteTask(taskId: string) {
   try {
-    await prisma.task.delete({ where: { id: taskId } })
+    await prisma.task.delete({ where: { id: taskId } });
   } catch (err) {
-    console.log(err)
+    console.error("Failed to delete task: ", err);
+    return { error: "Failed to delete task!" };
   }
 }
 
-export async function createTask(userId: string, content: string, theme: [string] | null = null) {
+export async function createTask(
+  userId: string,
+  content: string,
+  theme: [string] | null = null,
+) {
   try {
     const board = await prisma.board.findFirst({
-      where: {userId},
+      where: { userId },
       select: {
-        id: true
+        id: true,
       },
     });
     const todoColumn = await prisma.column.findFirst({
-      where: {boardId: board?.id, position: 0},
-      select: {id: true}
-    })
+      where: { boardId: board?.id, position: 0 },
+      select: { id: true },
+    });
     const task = await prisma.task.create({
       data: {
         content,
         columnId: todoColumn?.id,
-      }
-    })
+      },
+    });
     return {
       id: task.id,
       column: task.columnId as string,
       name: task.content,
       createdAt: task.createdAt,
-    }
+    };
   } catch (error) {
-    console.log(error)
+    console.error("Failed to create task: ", error);
+    return { error: "Failed to create task!" };
   }
 }
 
@@ -326,8 +380,152 @@ export async function changeTaskColumn(columnId: string, taskId: string) {
     await prisma.task.update({
       where: { id: taskId },
       data: { columnId: columnId },
-    })
+    });
   } catch (err) {
-    console.log(err)
+    console.error("Failed to change task column: ", err);
+    return { error: "Failed to change task column!" };
+  }
+}
+
+export async function thoughtsCreatedPerDay(
+  userId: string,
+): Promise<AreaChartData | { error: string }> {
+  try {
+    // Get a list of unique dates
+    // for each date see how many thoughts were created on that date
+    // return a date and a count
+
+    const response: AreaChartData = await prisma.$queryRaw`
+      SELECT DATE("createdAt") as date, COUNT(*)::int as count
+      FROM "Thought"
+      WHERE "userId" = ${userId}
+      GROUP BY DATE("createdAt")
+      ORDER BY date;
+    `;
+
+    if (!response.length) {
+      return { error: "No thoughts yet!" };
+    }
+
+    return response;
+  } catch (err) {
+    console.error("Failed to get thoughts created per day: ", err);
+    return { error: "Failed to get thoughts created per day!" };
+  }
+}
+
+export async function topFiveThemes(
+  userId: string,
+): Promise<BarChartData | { error: string }> {
+  try {
+    const thoughts = await prisma.thought.findMany({
+      where: { userId },
+      select: {
+        AIResponse: {
+          select: {
+            themes: true,
+          },
+        },
+      },
+    });
+
+    const arrayThemes = thoughts.flatMap((t) => t.AIResponse?.themes);
+
+    const themes: BarChartData = [];
+
+    arrayThemes.forEach((theme) => {
+      const isThemeInThemesArray = themes.find(
+        (t) => t.theme.toLowerCase() === theme?.toLowerCase(),
+      );
+
+      if (isThemeInThemesArray) {
+        const themeIndex = themes.findIndex(
+          (t) => t.theme.toLowerCase() === theme?.toLowerCase(),
+        );
+        return themes[themeIndex].count++;
+      }
+
+      themes.push({
+        theme: theme?.toLowerCase() as string,
+        count: 1,
+      });
+    });
+
+    if (!arrayThemes.length) {
+      return { error: "No themes yet!" };
+    }
+
+    return themes.sort((a, b) => b.count - a.count).slice(0, 5);
+  } catch (err) {
+    console.error("Error getting top 5 themes: ", err);
+    return { error: "Something went wrong!" };
+  }
+}
+
+export async function getTaskStats(
+  userId: string,
+): Promise<
+  { createdTasks: number; completedTasks: number } | { error: string }
+> {
+  try {
+    const board = await prisma.board.findFirst({
+      where: { userId },
+      select: {
+        columns: {
+          include: {
+            tasks: true,
+          },
+        },
+      },
+    });
+
+    if (!board) {
+      return { error: "Board not found!" };
+    }
+    const createdTasks = board.columns.flatMap((c) => c.tasks).length;
+    const completedTasks = board.columns.find((c) => c.title === "Done")?.tasks
+      .length;
+
+    return {
+      createdTasks,
+      completedTasks: completedTasks ? completedTasks : 0,
+    };
+  } catch (err) {
+    console.error("Failed to get task stats: ", err);
+    return { error: "Failed to get task stats!" };
+  }
+}
+
+// Activity heatmap action
+// - Return a date and thoughts created on that date activity = { date: Date, thoughtsCreated: number }
+// - Return 10 days worth of data - ( today - 10 )
+type ThoughtActivity = { date: Date; count: number }[];
+export async function getActivity(
+  userId: string,
+): Promise<ThoughtActivity | { error: string }> {
+  try {
+    const now = new Date();
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(now.getDate() - 10);
+
+    const result: ThoughtActivity = await prisma.$queryRaw`
+      SELECT
+        dates.date,
+        COUNT("Thought"."id") AS count
+      FROM generate_series(${tenDaysAgo}::date, ${now}::date, '1 day') AS dates(date)
+      LEFT JOIN "Thought"
+        ON DATE("Thought"."createdAt") = dates.date
+        AND "Thought"."userId" = ${userId}
+      GROUP BY dates.date
+      ORDER BY dates.date ASC;
+    `;
+
+    return result.map((activity) => ({
+      ...activity,
+      count: Number(activity.count),
+    }));
+  } catch (err) {
+    console.error("Failed to get activity: ", err);
+    return { error: "Failed to get activity!" };
   }
 }

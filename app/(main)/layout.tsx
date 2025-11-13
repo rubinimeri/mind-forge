@@ -1,10 +1,22 @@
 import React from 'react';
-import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar";
-import {AppSidebar} from "@/components/app-sidebar";
-import {Separator} from "@/components/ui/separator";
-import {headers} from "next/headers";
-import {Input} from "@/components/ui/input";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import { headers } from "next/headers";
+
+import { AppSidebar } from "@/components/app-sidebar";
+import { Separator } from "@/components/ui/separator";
+import { Input } from "@/components/ui/input";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger
+} from "@/components/ui/sidebar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import {ToggleThemeButton} from "@/components/toggle-theme-button";
 
 async function MainLayout({ children }: { children: React.ReactNode }) {
   const headersList = await headers();
@@ -22,8 +34,11 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
             className="mr-2 data-[orientation=vertical]:h-4"
           />
           <span className={"tracking-wider text-sm"}>{path === "/" ? "Home" : formattedPath}</span>
+          <ToggleThemeButton />
+
+        </header>
           {path === '/dashboard' && (
-            <>
+            <div className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
               <form className={"ml-auto"} >
                 <Input
                   className={"placeholder:text-gray-600"}
@@ -43,9 +58,8 @@ async function MainLayout({ children }: { children: React.ReactNode }) {
                   </SelectContent>
                 </Select>
               </form>
-            </>
+            </div>
           )}
-        </header>
         {children}
       </SidebarInset>
     </SidebarProvider>

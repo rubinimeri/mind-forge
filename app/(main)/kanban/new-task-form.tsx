@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Dialog,
@@ -6,41 +6,53 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
-import {Button} from "@/components/ui/button";
-import {Loader, Plus} from "lucide-react";
-import {useState} from "react";
-import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
-import {TagsInput} from "@/components/ui/tags-input";
-import {useForm} from "react-hook-form";
-import {z} from "zod";
-import {editTaskSchema} from "@/lib/schemas/auth.schema";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {useTasksStore} from "@/lib/store";
-import {createTask} from "@/app/actions";
+import { Button } from "@/components/ui/button";
+import { Loader, Plus } from "lucide-react";
+import { useState } from "react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { TagsInput } from "@/components/ui/tags-input";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { editTaskSchema } from "@/lib/schemas/auth.schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useTasksStore } from "@/lib/store";
+import { createTask } from "@/app/actions";
+import { toast } from "sonner";
 
 function NewTaskForm({ userId }: { userId: string }) {
-  const setTasks = useTasksStore(state => state.setTasks)
+  const setTasks = useTasksStore((state) => state.setTasks);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm < z.infer < typeof editTaskSchema >> ({
+  const form = useForm<z.infer<typeof editTaskSchema>>({
     resolver: zodResolver(editTaskSchema),
     defaultValues: {
-      "themes": []
+      themes: [],
     },
-  })
+  });
 
-  async function onSubmit(values: z.infer < typeof editTaskSchema >) {
+  async function onSubmit(values: z.infer<typeof editTaskSchema>) {
     setLoading(true);
     try {
-      const newTask = await createTask(userId, values.title)
-      if (!newTask) return;
-      setTasks(prevTasks => [...prevTasks, newTask])
+      const newTask = await createTask(userId, values.title);
+      if ("error" in newTask) {
+        setLoading(false);
+        return toast(newTask.error);
+      }
+
+      setTasks((prevTasks) => [...prevTasks, newTask]);
     } catch (error) {
-      console.log(error)
+      console.log(error);
     } finally {
       setLoading(false);
       setOpen(false);
@@ -60,29 +72,23 @@ function NewTaskForm({ userId }: { userId: string }) {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <DialogHeader>
-              <DialogTitle>
-                Create New Task
-              </DialogTitle>
+              <DialogTitle>Create New Task</DialogTitle>
               <DialogDescription>
-                Create a new task here, input task title and optionally add
-                a theme/s!
+                Create a new task here, input task title and optionally add a
+                theme/s!
               </DialogDescription>
             </DialogHeader>
             <FormField
               control={form.control}
               name="title"
-              render={({field}) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder=""
-
-                      type=""
-                      {...field} />
+                    <Input placeholder="" type="" {...field} />
                   </FormControl>
 
-                  <FormMessage/>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -90,7 +96,7 @@ function NewTaskForm({ userId }: { userId: string }) {
             <FormField
               control={form.control}
               name="themes"
-              render={({field}) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Enter your themes</FormLabel>
                   <FormControl>
@@ -102,30 +108,28 @@ function NewTaskForm({ userId }: { userId: string }) {
                     />
                   </FormControl>
 
-                  <FormMessage/>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => setOpen(false)}
-              >
+              <Button variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ?
-                  <Loader className={"animate-spin"}/> :
+                {loading ? (
+                  <Loader className={"animate-spin"} />
+                ) : (
                   "Save changes"
-                }
+                )}
               </Button>
             </DialogFooter>
           </form>
         </Form>
-
       </DialogContent>
     </Dialog>
   );
 }
 
 export default NewTaskForm;
+

@@ -1,8 +1,9 @@
 "use server"
 
-import {Button} from "@/components/ui/button";
-import {Trash} from "lucide-react";
+import { Trash } from "lucide-react";
+
 import { deleteThought } from "@/app/actions";
+import { Button } from "@/components/ui/button";
 
 function DeleteThoughtButton({ thoughtId }: { thoughtId: string }) {
   const deleteAction = deleteThought.bind(null, thoughtId);

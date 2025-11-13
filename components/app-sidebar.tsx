@@ -1,4 +1,13 @@
 import * as React from "react"
+import { headers } from "next/headers";
+import {
+  Home,
+  LayoutDashboard,
+  ChartArea,
+  Kanban
+} from "lucide-react";
+
+import Logo from "@/components/logo";
 import {
   Sidebar,
   SidebarContent, SidebarFooter,
@@ -10,10 +19,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import {Home, LayoutDashboard, ChartArea, Kanban} from "lucide-react";
-import {NavUser} from "@/components/nav-user";
-import {auth} from "@/auth";
-import {headers} from "next/headers";
+import { NavUser } from "@/components/nav-user";
+import { auth } from "@/auth";
+
 
 const data = {
   navMain: [
@@ -49,7 +57,7 @@ const data = {
 export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const session = await auth()
-  if (!session?.user) return null
+  if (!session) return null
 
   const { user } = session
 
@@ -57,9 +65,9 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
   const pathname = headersList.get('x-pathname')
 
   return (
-    <Sidebar {...props}>
+    <Sidebar collapsible={"icon"} {...props}>
       <SidebarHeader>
-        <img src="/horizontal-logo.png" alt="" width={140}/>
+        <Logo width={120} height={30} />
       </SidebarHeader>
       <SidebarContent>
         {data.navMain.map((item) => (
@@ -68,8 +76,13 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
               <SidebarMenu>
                 {item.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.url === pathname} >
-                      <a href={item.url}>{item.icon}{item.title}</a>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={item.url === pathname}
+                    >
+                      <a href={item.url}>
+                        {item.icon}{item.title}
+                      </a>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -79,9 +92,15 @@ export async function AppSidebar({ ...props }: React.ComponentProps<typeof Sideb
         ))}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={{ name: `${user.name} ${user.lastName || ''}`, email: user.email, avatar: "https://ui.shadcn.com/avatars/shadcn.jpg" }} />
+        <NavUser
+          user={{
+            name: `${user.name} ${user.lastName || ''}`,
+            email: user.email,
+            avatar: "https://ui.shadcn.com/avatars/shadcn.jpg"
+          }}
+        />
       </SidebarFooter>
-      <SidebarRail />
+      <SidebarRail/>
     </Sidebar>
   )
 }

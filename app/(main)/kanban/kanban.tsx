@@ -1,34 +1,35 @@
-'use client';
+"use client";
 import {
   KanbanBoard,
   KanbanCard,
   KanbanCards,
   KanbanHeader,
   KanbanProvider,
-} from '@/components/ui/shadcn-io/kanban';
-import {useEffect, useState} from 'react';
-import {dateFormatter} from "@/lib/utils";
-import {deleteTask, getColumns, getSavedTasks} from "@/app/actions";
-import {KanbanColumn} from "@/lib/defintions";
+} from "@/components/ui/shadcn-io/kanban";
+import { useEffect, useState } from "react";
+import { dateFormatter } from "@/lib/utils";
+import { deleteTask, getColumns, getSavedTasks } from "@/app/actions";
+import { KanbanColumn } from "@/lib/defintions";
 import EditTaskForm from "@/app/(main)/kanban/edit-task-form";
-import {Button} from "@/components/ui/button";
-import {Loader, Trash} from "lucide-react";
-import {useTasksStore} from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { Loader, Trash } from "lucide-react";
+import { useTasksStore } from "@/lib/store";
+import { toast } from "sonner";
 
 const Kanban = ({ userId }: { userId: string }) => {
-  const { tasks, setTasks } = useTasksStore()
-  const [columns, setColumns] = useState<KanbanColumn[]>([])
-  const [loading, setLoading] = useState(false)
+  const { tasks, setTasks } = useTasksStore();
+  const [columns, setColumns] = useState<KanbanColumn[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchColumns = async () => {
       try {
-        const columns = await getColumns(userId)
+        const columns = await getColumns(userId);
         setColumns(columns);
       } catch (err) {
         console.error(err);
       }
-    }
+    };
 
     const fetchTasks = async () => {
       try {
@@ -37,45 +38,42 @@ const Kanban = ({ userId }: { userId: string }) => {
       } catch (err) {
         console.error(err);
       }
-    }
+    };
 
     fetchColumns();
     fetchTasks();
-  }, []);
+  }, [setTasks, userId]);
 
   const onEdit = (taskId: string, taskTitle: string) => {
     // Find task
     const task = tasks.find((task) => task.id === taskId);
     const taskIndex = tasks.findIndex((task) => task.id === taskId);
-    console.log(task, taskIndex);
-    if (!task)
-      return console.log("Error: failed to edit task");
+    if (!task) return console.log("Error: failed to edit task");
 
     task.name = taskTitle;
     const newTasks = [...tasks];
     newTasks[taskIndex] = task;
-    console.log(newTasks[taskIndex])
     setTasks(newTasks);
-  }
+  };
 
   const handleDelete = async (taskId: string) => {
     setLoading(true);
     try {
-      await deleteTask(taskId);
+      const response = await deleteTask(taskId);
+      if (response && "error" in response) {
+        setLoading(false);
+        return toast(response.error);
+      }
       setTasks(tasks.filter((task) => task.id !== taskId));
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <KanbanProvider
-      columns={columns}
-      data={tasks}
-      onDataChange={setTasks}
-    >
+    <KanbanProvider columns={columns} data={tasks} onDataChange={setTasks}>
       {(column) => (
         <KanbanBoard id={column.id} key={column.id} className={"bg-card"}>
           <KanbanHeader>
@@ -107,10 +105,15 @@ const Kanban = ({ userId }: { userId: string }) => {
                     size={"sm"}
                     disabled={loading}
                     onClick={() => handleDelete(task.id)}
-                    className={"absolute bottom-[5px] right-9 !p-0 border-none hover:bg-card"}>
-                    {loading ?
-                      <Loader className={"animate-spin"} /> :
-                      <Trash/>}
+                    className={
+                      "absolute bottom-[5px] right-9 !p-0 border-none hover:bg-card"
+                    }
+                  >
+                    {loading ? (
+                      <Loader className={"animate-spin"} />
+                    ) : (
+                      <Trash />
+                    )}
                   </Button>
                 }
               >
@@ -135,6 +138,3 @@ const Kanban = ({ userId }: { userId: string }) => {
   );
 };
 export default Kanban;
-
-
-
