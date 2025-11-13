@@ -28,10 +28,12 @@ export default async function RootLayout({
     try {
       await prisma.$transaction(async (tx) => {
         await tx.task.deleteMany({
-          where: { AIResponse: { thought: { userId: session.user.id } } },
+          where: {
+            AIResponse: { thought: { userId: session.user.id, saved: false } },
+          },
         });
         await tx.aIResponse.deleteMany({
-          where: { thought: { userId: session.user.id } },
+          where: { thought: { userId: session.user.id, saved: false } },
         });
         await tx.thought.deleteMany({
           where: { userId: session.user.id, saved: false },
