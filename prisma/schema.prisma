@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id            String    @unique @default(uuid())
+  id            String    @id @default(uuid())
   email         String    @unique
   emailVerified DateTime?
   image         String?
@@ -52,14 +52,14 @@ model Account {
 }
 
 model Board {
-  id      String   @unique @default(uuid())
+  id      String   @id @default(uuid())
   user    User     @relation(fields: [userId], references: [id])
   userId  String   @unique
   columns Column[]
 }
 
 model Column {
-  id       String  @unique @default(uuid())
+  id       String  @id @default(uuid())
   Board    Board?  @relation(fields: [boardId], references: [id])
   boardId  String?
   title    String
@@ -68,7 +68,7 @@ model Column {
 }
 
 model Thought {
-  id         String      @unique @default(uuid())
+  id         String      @id @default(uuid())
   user       User        @relation(fields: [userId], references: [id])
   userId     String
   content    String
@@ -78,7 +78,7 @@ model Thought {
 }
 
 model AIResponse {
-  id            String   @unique @default(uuid())
+  id            String   @id @default(uuid())
   thought       Thought  @relation(fields: [thoughtId], references: [id])
   thoughtId     String   @unique
   insight       String
@@ -89,7 +89,7 @@ model AIResponse {
 }
 
 model Task {
-  id           String      @unique @default(uuid())
+  id           String      @id @default(uuid())
   content      String
   theme        String?
   AIResponse   AIResponse? @relation(fields: [AIResponseId], references: [id])
