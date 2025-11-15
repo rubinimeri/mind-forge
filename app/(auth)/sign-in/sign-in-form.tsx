@@ -31,13 +31,11 @@ export default function SignInForm() {
 
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     try {
-      console.log(values);
       const response = await signIn("credentials", {
         email: values.email,
         password: values.password,
         redirect: false,
       });
-      console.log(response);
       if (response?.error === "CredentialsSignin") {
         setError("Invalid email or password!");
       } else if (response?.error) {
