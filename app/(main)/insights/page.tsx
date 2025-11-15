@@ -139,13 +139,12 @@ async function Page() {
           {"error" in activity ? (
             <p>{activity.error}</p>
           ) : (
-            activity.map((value) => {
+            activity.map((value, index) => {
               const colorWeight = colorWeights(value.count);
               return (
-                <Tooltip>
-                  <TooltipTrigger key={value.count}>
+                <Tooltip key={index}>
+                  <TooltipTrigger>
                     <div
-                      key={value.count}
                       className={`${colorWeight} border w-4 h-4 rounded`}
                     ></div>
                   </TooltipTrigger>
